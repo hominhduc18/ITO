@@ -1,10 +1,25 @@
 ﻿// components/ServiceCatalog.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+
+interface APIService {
+    dichVu_Id: number;
+    nhomDichVu_Id: number;
+    maDichVu: string;
+    tenDichVu: string;
+    tenKhongDau: string;
+    giaDichVu?: number;
+    giaBHYT?: number;
+    trangThai?: number;
+    khoaId?: number;
+    tenKhoa?: string;
+    tenNhomDichVu?: string;
+}
 
 interface Service {
     id: number;
     code: string;
     name: string;
+    nameEn: string;
     group: string;
     department: string;
     servicePrice: number;
@@ -12,25 +27,13 @@ interface Service {
     status: 'active' | 'inactive';
     updatedBy: string;
     updatedAt: string;
-    description?: string;
-}
-
-interface ServiceFormData {
-    code: string;
-    name: string;
-    group: string;
-    department: string;
-    servicePrice: number;
-    insurancePrice: number;
-    description: string;
-    status: 'active' | 'inactive';
 }
 
 interface Filters {
     search: string;
     group: string;
     department: string;
-    priceType: string;
+    searchLanguage: string;
 }
 
 interface Pagination {
@@ -40,364 +43,302 @@ interface Pagination {
 }
 
 export function ServiceCatalogForm() {
-    const [services, setServices] = useState<Service[]>([
-        {
-            id: 1,
-            code: 'DV001',
-            name: 'Khám tổng quát',
-            group: 'Khám bệnh',
-            department: 'Khám bệnh',
-            servicePrice: 300000,
-            insurancePrice: 150000,
-            status: 'active',
-            updatedBy: 'admin',
-            updatedAt: '2024-01-15',
-            description: 'Khám tổng quát sức khỏe định kỳ'
-        },
-        {
-            id: 2,
-            code: 'DV002',
-            name: 'Xét nghiệm máu',
-            group: 'Xét nghiệm',
-            department: 'Xét nghiệm',
-            servicePrice: 150000,
-            insurancePrice: 75000,
-            status: 'active',
-            updatedBy: 'DUC',
-            updatedAt: '2024-01-15',
-            description: 'Xét nghiệm công thức máu cơ bản'
-        },
-        {
-            id: 3,
-            code: 'DV003',
-            name: 'Chụp X-quang',
-            group: 'Chẩn đoán hình ảnh',
-            department: 'Chẩn đoán hình ảnh',
-            servicePrice: 250000,
-            insurancePrice: 125000,
-            status: 'inactive',
-            updatedBy: 'Hồ Minh Đức',
-            updatedAt: '2024-01-14',
-            description: 'Chụp X-quang ngực thẳng'
-        },
-        {
-            id: 4,
-            code: 'DV004',
-            name: 'Siêu âm bụng tổng quát',
-            group: 'Chẩn đoán hình ảnh',
-            department: 'Chẩn đoán hình ảnh',
-            servicePrice: 350000,
-            insurancePrice: 200000,
-            status: 'active',
-            updatedBy: 'admin',
-            updatedAt: '2024-01-12',
-            description: 'Siêu âm tổng quát đánh giá gan, thận, tụy, lách'
-        },
-        {
-            id: 5,
-            code: 'DV005',
-            name: 'Điện tim (ECG)',
-            group: 'Tim mạch',
-            department: 'Tim mạch',
-            servicePrice: 180000,
-            insurancePrice: 90000,
-            status: 'active',
-            updatedBy: 'BS. An',
-            updatedAt: '2024-01-13',
-            description: 'Ghi và phân tích hoạt động điện tim'
-        },
-        {
-            id: 6,
-            code: 'DV006',
-            name: 'Chụp MRI não',
-            group: 'Chẩn đoán hình ảnh',
-            department: 'Chẩn đoán hình ảnh',
-            servicePrice: 1800000,
-            insurancePrice: 1200000,
-            status: 'active',
-            updatedBy: 'BS. Châu',
-            updatedAt: '2024-01-10',
-            description: 'Chụp cộng hưởng từ vùng não – không tiêm thuốc tương phản'
-        },
-        {
-            id: 7,
-            code: 'DV007',
-            name: 'Phẫu thuật nội soi ruột thừa',
-            group: 'Phẫu thuật',
-            department: 'Ngoại tổng quát',
-            servicePrice: 5000000,
-            insurancePrice: 3500000,
-            status: 'active',
-            updatedBy: 'BS. Dũng',
-            updatedAt: '2024-01-08',
-            description: 'Phẫu thuật nội soi cắt ruột thừa dưới gây mê toàn thân'
-        },
-        {
-            id: 8,
-            code: 'DV008',
-            name: 'Thay băng vết thương nhỏ',
-            group: 'Thủ thuật',
-            department: 'Khoa Điều dưỡng',
-            servicePrice: 80000,
-            insurancePrice: 40000,
-            status: 'active',
-            updatedBy: 'Điều dưỡng Hạnh',
-            updatedAt: '2024-01-17',
-            description: 'Thay băng, sát khuẩn vết thương dưới 2cm'
-        },
-        {
-            id: 9,
-            code: 'DV009',
-            name: 'Nội soi dạ dày',
-            group: 'Thủ thuật',
-            department: 'Tiêu hoá',
-            servicePrice: 600000,
-            insurancePrice: 350000,
-            status: 'active',
-            updatedBy: 'BS. Hòa',
-            updatedAt: '2024-01-09',
-            description: 'Nội soi dạ dày chẩn đoán có gây tê họng'
-        },
-        {
-            id: 10,
-            code: 'DV010',
-            name: 'Siêu âm thai 3D',
-            group: 'Sản phụ khoa',
-            department: 'Sản',
-            servicePrice: 450000,
-            insurancePrice: 200000,
-            status: 'active',
-            updatedBy: 'BS. Lan',
-            updatedAt: '2024-01-05',
-            description: 'Siêu âm 3D đánh giá hình thái thai nhi'
-        },
-        {
-            id: 11,
-            code: 'DV011',
-            name: 'Chụp CT ngực có cản quang',
-            group: 'Chẩn đoán hình ảnh',
-            department: 'Chẩn đoán hình ảnh',
-            servicePrice: 1200000,
-            insurancePrice: 800000,
-            status: 'inactive',
-            updatedBy: 'BS. Sơn',
-            updatedAt: '2024-01-11',
-            description: 'Chụp cắt lớp vi tính vùng ngực có tiêm thuốc cản quang'
-        },
-        {
-            id: 12,
-            code: 'DV012',
-            name: 'Điều trị vật lý trị liệu chi trên',
-            group: 'Phục hồi chức năng',
-            department: 'PHCN',
-            servicePrice: 200000,
-            insurancePrice: 100000,
-            status: 'active',
-            updatedBy: 'KTV. Thảo',
-            updatedAt: '2024-01-15',
-            description: 'Tập phục hồi vận động khớp vai, khuỷu, cổ tay'
-        },
-        {
-            id: 13,
-            code: 'DV013',
-            name: 'Gây mê toàn thân',
-            group: 'Gây mê hồi sức',
-            department: 'GMHS',
-            servicePrice: 800000,
-            insurancePrice: 500000,
-            status: 'active',
-            updatedBy: 'BS. Oanh',
-            updatedAt: '2024-01-13',
-            description: 'Gây mê toàn thân trong phẫu thuật lớn'
-        },
-        {
-            id: 14,
-            code: 'DV014',
-            name: 'Xét nghiệm nước tiểu',
-            group: 'Xét nghiệm',
-            department: 'Xét nghiệm',
-            servicePrice: 100000,
-            insurancePrice: 50000,
-            status: 'active',
-            updatedBy: 'DUC',
-            updatedAt: '2024-01-12',
-            description: 'Phân tích thành phần nước tiểu bằng máy tự động'
-        },
-        {
-            id: 15,
-            code: 'DV015',
-            name: 'Khám chuyên khoa Tim mạch',
-            group: 'Khám bệnh',
-            department: 'Tim mạch',
-            servicePrice: 400000,
-            insurancePrice: 200000,
-            status: 'active',
-            updatedBy: 'admin',
-            updatedAt: '2024-01-15',
-            description: 'Khám, chẩn đoán và tư vấn điều trị bệnh lý tim mạch'
-        },
-        {
-            id: 16,
-            code: 'DV016',
-            name: 'Xét nghiệm đường huyết nhanh',
-            group: 'Xét nghiệm',
-            department: 'Xét nghiệm',
-            servicePrice: 70000,
-            insurancePrice: 30000,
-            status: 'active',
-            updatedBy: 'DUC',
-            updatedAt: '2024-01-15',
-            description: 'Kiểm tra nhanh đường huyết mao mạch'
-        },
-        {
-            id: 17,
-            code: 'DV017',
-            name: 'Khâu vết thương nhỏ',
-            group: 'Thủ thuật',
-            department: 'Ngoại tổng quát',
-            servicePrice: 250000,
-            insurancePrice: 125000,
-            status: 'active',
-            updatedBy: 'BS. Minh',
-            updatedAt: '2024-01-13',
-            description: 'Khâu vết thương phần mềm dưới 5cm'
-        },
-        {
-            id: 18,
-            code: 'DV018',
-            name: 'Cắt chỉ sau mổ',
-            group: 'Thủ thuật',
-            department: 'Ngoại tổng quát',
-            servicePrice: 50000,
-            insurancePrice: 25000,
-            status: 'active',
-            updatedBy: 'Điều dưỡng Hạnh',
-            updatedAt: '2024-01-14',
-            description: 'Thủ thuật cắt chỉ sau phẫu thuật'
-        },
-        {
-            id: 19,
-            code: 'DV019',
-            name: 'Chụp CT sọ não không cản quang',
-            group: 'Chẩn đoán hình ảnh',
-            department: 'Chẩn đoán hình ảnh',
-            servicePrice: 1000000,
-            insurancePrice: 700000,
-            status: 'active',
-            updatedBy: 'BS. Sơn',
-            updatedAt: '2024-01-10',
-            description: 'Chụp CT sọ não đánh giá xuất huyết và khối choán chỗ'
-        },
-        {
-            id: 20,
-            code: 'DV020',
-            name: 'Khám sức khỏe định kỳ doanh nghiệp',
-            group: 'Khám bệnh',
-            department: 'Khám bệnh',
-            servicePrice: 500000,
-            insurancePrice: 0,
-            status: 'active',
-            updatedBy: 'admin',
-            updatedAt: '2024-01-09',
-            description: 'Khám sức khỏe tổng thể cho nhân viên công ty'
-        }
-    ]);
+    const [services, setServices] = useState<Service[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [debugInfo, setDebugInfo] = useState<string>('');
 
     const [filters, setFilters] = useState<Filters>({
         search: '',
         group: '',
         department: '',
-        priceType: ''
+        searchLanguage: 'both'
     });
 
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
         pageSize: 20,
-        total: 100
+        total: 0
     });
 
-    const [showForm, setShowForm] = useState(false);
-    const [selectedService, setSelectedService] = useState<Service | null>(null);
     const [showDetail, setShowDetail] = useState(false);
+    const [selectedService, setSelectedService] = useState<Service | null>(null);
 
-    // Filter services based on criteria
-    const filteredServices = services.filter(service => {
-        const matchesSearch = !filters.search ||
-            service.code.toLowerCase().includes(filters.search.toLowerCase()) ||
-            service.name.toLowerCase().includes(filters.search.toLowerCase());
+    // Fetch data từ API - CHỈ GET
+    useEffect(() => {
+        fetchServicesFromAPI();
+    }, []);
 
-        const matchesGroup = !filters.group || service.group === filters.group;
-        const matchesDepartment = !filters.department || service.department === filters.department;
+    const fetchServicesFromAPI = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            setDebugInfo('Bắt đầu gọi API...');
 
-        return matchesSearch && matchesGroup && matchesDepartment;
-    });
+            console.log('Đang gọi API Danh mục dịch vụ...');
+            const apiUrl = '/api/DichVu';
+            setDebugInfo(`Gọi API: ${apiUrl}`);
 
-    const handleFilterChange = (key: keyof Filters, value: string) => {
+            const response = await fetch(apiUrl);
+            setDebugInfo(`API response status: ${response.status} ${response.statusText}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+            }
+
+            const data: APIService[] = await response.json();
+            console.log('API response data:', data);
+            setDebugInfo(`API trả về ${data.length} items, kiểu dữ liệu: ${typeof data}`);
+
+            if (!Array.isArray(data)) {
+                throw new Error(`Dữ liệu API trả về không phải array: ${typeof data}`);
+            }
+
+            if (data.length === 0) {
+                setDebugInfo('API trả về mảng rỗng');
+                console.warn('API trả về danh sách dịch vụ rỗng');
+            }
+
+            const convertedServices: Service[] = data.map((apiService) => {
+                return {
+                    id: apiService.dichVu_Id,
+                    code: apiService.maDichVu || 'N/A',
+                    name: apiService.tenDichVu || 'Không có tên',
+                    nameEn: apiService.tenKhongDau || apiService.tenDichVu || 'No name',
+                    group: apiService.tenNhomDichVu || `Nhóm ${apiService.nhomDichVu_Id}`,
+                    department: apiService.tenKhoa || 'Chưa xác định',
+                    servicePrice: apiService.giaDichVu || 0,
+                    insurancePrice: apiService.giaBHYT || 0,
+                    status: apiService.trangThai === 0 ? 'inactive' : 'active',
+                    updatedBy: 'system',
+                    updatedAt: new Date().toISOString().split('T')[0]
+                };
+            });
+
+            console.log('✅ Converted services:', convertedServices);
+          //  setDebugInfo(`Chuyển đổi thành công ${convertedServices.length} dịch vụ`);
+
+            setServices(convertedServices);
+            setPagination(prev => ({ ...prev, total: convertedServices.length }));
+
+        } catch (err) {
+            console.error('❌ Error fetching services:', err);
+            const errorMessage = `Không thể tải danh sách dịch vụ: ${err instanceof Error ? err.message : 'Unknown error'}`;
+            setError(errorMessage);
+            setDebugInfo(`Lỗi: ${errorMessage}`);
+
+
+            setServices([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Tối ưu hóa filter với useMemo
+    const filteredServices = useMemo(() => {
+        if (!filters.search && !filters.group && !filters.department) {
+            return services;
+        }
+
+        return services.filter(service => {
+            const matchesSearch = !filters.search ||
+                service.code.toLowerCase().includes(filters.search.toLowerCase()) ||
+                (filters.searchLanguage === 'vi' && service.name.toLowerCase().includes(filters.search.toLowerCase())) ||
+                (filters.searchLanguage === 'en' && service.nameEn.toLowerCase().includes(filters.search.toLowerCase())) ||
+                (filters.searchLanguage === 'both' && (
+                    service.name.toLowerCase().includes(filters.search.toLowerCase()) ||
+                    service.nameEn.toLowerCase().includes(filters.search.toLowerCase())
+                ));
+
+            const matchesGroup = !filters.group || service.group === filters.group;
+            const matchesDepartment = !filters.department || service.department === filters.department;
+
+            return matchesSearch && matchesGroup && matchesDepartment;
+        });
+    }, [services, filters.search, filters.group, filters.department, filters.searchLanguage]);
+
+    // Tối ưu hóa pagination với useMemo
+    const paginatedServices = useMemo(() => {
+        const startIndex = (pagination.page - 1) * pagination.pageSize;
+        const endIndex = startIndex + pagination.pageSize;
+        return filteredServices.slice(startIndex, endIndex);
+    }, [filteredServices, pagination.page, pagination.pageSize]);
+
+    const totalPages = Math.ceil(filteredServices.length / pagination.pageSize);
+
+    // Lấy danh sách các nhóm dịch vụ và khoa duy nhất từ API với useMemo
+    const serviceGroups = useMemo(() =>
+            [...new Set(services.map(service => service.group))].sort(),
+        [services]
+    );
+
+    const departments = useMemo(() =>
+            [...new Set(services.map(service => service.department))].sort(),
+        [services]
+    );
+
+    const handleFilterChange = useCallback((key: keyof Filters, value: string) => {
         setFilters(prev => ({ ...prev, [key]: value }));
-    };
+        // Reset về trang 1 khi filter thay đổi
+        setPagination(prev => ({ ...prev, page: 1 }));
+    }, []);
 
-    const handleAddService = () => {
-        setSelectedService(null);
-        setShowForm(true);
-    };
-
-    const handleEditService = (service: Service) => {
-        setSelectedService(service);
-        setShowForm(true);
-    };
-
-    const handleViewDetail = (service: Service) => {
+    const handleViewDetail = useCallback((service: Service) => {
         setSelectedService(service);
         setShowDetail(true);
-    };
+    }, []);
 
-    const handleDeleteService = (id: number) => {
-        if (confirm('Bạn có chắc muốn xóa dịch vụ này?')) {
-            setServices(prev => prev.filter(service => service.id !== id));
-        }
-    };
+    const handleRefresh = useCallback(() => {
+        fetchServicesFromAPI();
+    }, [fetchServicesFromAPI]);
 
-    const handleSaveService = (serviceData: ServiceFormData) => {
-        if (selectedService) {
-            // Update existing service
-            setServices(prev => prev.map(service =>
-                service.id === selectedService.id
-                    ? {
-                        ...service,
-                        ...serviceData,
-                        updatedAt: new Date().toISOString().split('T')[0]
-                    }
-                    : service
-            ));
-        } else {
-            // Add new service
-            const newService: Service = {
-                id: Math.max(...services.map(s => s.id)) + 1,
-                ...serviceData,
-                updatedBy: 'admin',
-                updatedAt: new Date().toISOString().split('T')[0]
-            };
-            setServices(prev => [...prev, newService]);
-        }
-        setShowForm(false);
-    };
+    // Reset filters
+    const handleResetFilters = useCallback(() => {
+        setFilters({
+            search: '',
+            group: '',
+            department: '',
+            searchLanguage: 'both'
+        });
+        setPagination(prev => ({ ...prev, page: 1 }));
+    }, []);
+
+    // Test với dữ liệu mẫu tạm thời
+    const useSampleData = useCallback(() => {
+        const sampleData: Service[] = [
+            {
+                id: 1,
+                code: "DV001",
+                name: "Khám tổng quát",
+                nameEn: "General examination",
+                group: "Khám bệnh",
+                department: "Khoa Khám bệnh",
+                servicePrice: 200000,
+                insurancePrice: 150000,
+                status: 'active',
+                updatedBy: 'system',
+                updatedAt: '2024-01-15'
+            },
+            {
+                id: 2,
+                code: "XN001",
+                name: "Xét nghiệm máu",
+                nameEn: "Blood test",
+                group: "Xét nghiệm",
+                department: "Khoa Xét nghiệm",
+                servicePrice: 150000,
+                insurancePrice: 100000,
+                status: 'active',
+                updatedBy: 'system',
+                updatedAt: '2024-01-15'
+            },
+            {
+                id: 3,
+                code: "CDHA001",
+                name: "Chụp X-Quang ngực",
+                nameEn: "Chest X-Ray",
+                group: "Chẩn đoán hình ảnh",
+                department: "Khoa Chẩn đoán hình ảnh",
+                servicePrice: 300000,
+                insurancePrice: 250000,
+                status: 'active',
+                updatedBy: 'system',
+                updatedAt: '2024-01-15'
+            }
+        ];
+        setServices(sampleData);
+        setPagination(prev => ({ ...prev, total: sampleData.length }));
+        setDebugInfo('Đang sử dụng dữ liệu mẫu');
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="service-catalog">
+                <div className="loading-state">
+                    <div className="loading-spinner"></div>
+                    <p>Đang tải danh sách dịch vụ từ API...</p>
+                    <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
+                        {debugInfo}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="service-catalog">
             {/* Header / Toolbar */}
             <div className="catalog-header">
-                <h1>Danh Mục Dịch Vụ Tại ITO</h1>
+                <div className="header-top">
+                    <h1>Danh Mục Dịch Vụ</h1>
+                    <div className="header-actions">
+                        <button className="btn secondary" onClick={handleRefresh}>
+                            <span className="btn-icon">🔄</span>
+                            Làm mới API
+                        </button>
+                        <button className="btn secondary" onClick={useSampleData}>
+                            <span className="btn-icon">🧪</span>
+                            Dữ liệu mẫu
+                        </button>
+                        <div className="api-info">
+                            <span className="api-status">📡 API GET</span>
+                            <span className="item-count">{services.length.toLocaleString()} dịch vụ</span>
+                        </div>
+                    </div>
+                </div>
+
+                {error && (
+                    <div className="error-banner">
+                        <div>
+                            <strong>Lỗi kết nối API:</strong>
+                            <span style={{marginLeft: '10px'}}>{error}</span>
+                        </div>
+                        <div>
+                            <button onClick={fetchServicesFromAPI}>Thử lại API</button>
+                            <button onClick={useSampleData} style={{marginLeft: '10px', background: '#10b981'}}>
+                                Dùng dữ liệu mẫu
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Debug info */}
+                {debugInfo && (
+                    <div style={{
+                        background: '#f3f4f6',
+                        padding: '8px 12px',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        marginBottom: '12px',
+                        border: '1px solid #e5e7eb'
+                    }}>
+                        <strong>Debug:</strong> {debugInfo}
+                    </div>
+                )}
+
                 <div className="toolbar">
                     <div className="filter-group">
-                        <div className="search-box">
-                            <span className="search-icon">🔍</span>
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm mã, tên dịch vụ..."
-                                value={filters.search}
-                                onChange={(e) => handleFilterChange('search', e.target.value)}
-                                className="search-input"
-                            />
+                        <div className="search-container">
+                            <div className="search-box">
+                                <span className="search-icon">🔍</span>
+                                <input
+                                    type="text"
+                                    placeholder="Tìm theo mã, tên dịch vụ (Việt/Anh)..."
+                                    value={filters.search}
+                                    onChange={(e) => handleFilterChange('search', e.target.value)}
+                                    className="search-input"
+                                />
+                            </div>
+                            <select
+                                value={filters.searchLanguage}
+                                onChange={(e) => handleFilterChange('searchLanguage', e.target.value)}
+                                className="language-select"
+                                title="Chọn ngôn ngữ tìm kiếm"
+                            >
+                                <option value="both">Tìm cả Việt & Anh</option>
+                                <option value="vi">Chỉ tiếng Việt</option>
+                                <option value="en">Chỉ tiếng Anh</option>
+                            </select>
                         </div>
 
                         <select
@@ -406,10 +347,9 @@ export function ServiceCatalogForm() {
                             className="filter-select"
                         >
                             <option value="">Tất cả nhóm dịch vụ</option>
-                            <option value="Khám bệnh">Khám bệnh</option>
-                            <option value="Xét nghiệm">Xét nghiệm</option>
-                            <option value="Chẩn đoán hình ảnh">Chẩn đoán hình ảnh</option>
-                            <option value="Phẫu thuật">Phẫu thuật</option>
+                            {serviceGroups.map(group => (
+                                <option key={group} value={group}>{group}</option>
+                            ))}
                         </select>
 
                         <select
@@ -418,38 +358,35 @@ export function ServiceCatalogForm() {
                             className="filter-select"
                         >
                             <option value="">Tất cả khoa</option>
-                            <option value="Khám bệnh">Khám bệnh</option>
-                            <option value="Xét nghiệm">Xét nghiệm</option>
-                            <option value="Chẩn đoán hình ảnh">Chẩn đoán hình ảnh</option>
-                            <option value="Ngoại khoa">Ngoại khoa</option>
+                            {departments.map(dept => (
+                                <option key={dept} value={dept}>{dept}</option>
+                            ))}
                         </select>
 
-                        <select
-                            value={filters.priceType}
-                            onChange={(e) => handleFilterChange('priceType', e.target.value)}
-                            className="filter-select"
-                        >
-                            <option value="">Tất cả loại giá</option>
-                            <option value="BHYT">BHYT</option>
-                            <option value="DV">Dịch vụ</option>
-                        </select>
+                        {(filters.search || filters.group || filters.department) && (
+                            <button className="btn secondary" onClick={handleResetFilters}>
+                                <span className="btn-icon">❌</span>
+                                Xóa bộ lọc
+                            </button>
+                        )}
                     </div>
 
                     <div className="action-buttons">
-                        <button className="btn primary" onClick={handleAddService}>
-                            <span className="btn-icon">➕</span>
-                            Thêm dịch vụ
-                        </button>
-                        <button className="btn secondary">
+                        <button className="btn secondary" onClick={() => alert('Chức năng đang phát triển')}>
                             <span className="btn-icon">📤</span>
-                            Import Excel
-                        </button>
-                        <button className="btn secondary">
-                            <span className="btn-icon">⬇️</span>
                             Export Excel
                         </button>
                     </div>
                 </div>
+
+                {/* Filter summary */}
+                {(filters.search || filters.group || filters.department) && (
+                    <div className="filter-summary">
+                        <span className="filtered-count">
+                            Đang hiển thị {filteredServices.length.toLocaleString()} trên {services.length.toLocaleString()} dịch vụ
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Services Table */}
@@ -457,98 +394,99 @@ export function ServiceCatalogForm() {
                 <table className="services-table">
                     <thead>
                     <tr>
-                        <th>Mã</th>
-                        <th>Tên dịch vụ</th>
+                        <th>Mã DV</th>
+                        <th>Tên dịch vụ (VN)</th>
+                        <th>Tên không dấu</th>
                         <th>Nhóm</th>
                         <th>Khoa</th>
                         <th>Giá DV</th>
                         <th>Giá BHYT</th>
                         <th>Trạng thái</th>
-                        <th>Cập nhật bởi</th>
                         <th>Hành động</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {filteredServices.map(service => (
-                        <tr key={service.id}>
-                            <td className="code-cell">{service.code}</td>
-                            <td className="name-cell">{service.name}</td>
-                            <td>{service.group}</td>
-                            <td>{service.department}</td>
-                            <td className="price-cell">{service.servicePrice.toLocaleString()}đ</td>
-                            <td className="price-cell">{service.insurancePrice.toLocaleString()}đ</td>
-                            <td>
-                                    <span className={`status-badge ${service.status}`}>
-                                        {service.status === 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động'}
-                                    </span>
-                            </td>
-                            <td>{service.updatedBy}</td>
-                            <td className="actions-cell">
-                                <button
-                                    className="btn-icon view-btn"
-                                    onClick={() => handleViewDetail(service)}
-                                    title="Xem chi tiết"
-                                >
-                                    👁️
-                                </button>
-                                <button
-                                    className="btn-icon edit-btn"
-                                    onClick={() => handleEditService(service)}
-                                    title="Sửa"
-                                >
-                                    ✏️
-                                </button>
-                                <button
-                                    className="btn-icon delete-btn"
-                                    onClick={() => handleDeleteService(service.id)}
-                                    title="Xóa"
-                                >
-                                    🗑️
-                                </button>
+                    {paginatedServices.length === 0 ? (
+                        <tr>
+                            <td colSpan={9} className="empty-state">
+                                {services.length === 0 ?
+                                    'Không có dữ liệu dịch vụ. Hãy thử "Dữ liệu mẫu" hoặc kiểm tra kết nối API.'
+                                    : 'Không tìm thấy dịch vụ phù hợp'
+                                }
                             </td>
                         </tr>
-                    ))}
+                    ) : (
+                        paginatedServices.map(service => (
+                            <tr key={service.id}>
+                                <td className="code-cell">{service.code}</td>
+                                <td className="name-cell">{service.name}</td>
+                                <td className="name-en-cell">{service.nameEn}</td>
+                                <td>{service.group}</td>
+                                <td>{service.department}</td>
+                                <td className="price-cell">{service.servicePrice.toLocaleString()}đ</td>
+                                <td className="price-cell">{service.insurancePrice.toLocaleString()}đ</td>
+                                <td>
+                                        <span className={`status-badge ${service.status}`}>
+                                            {service.status === 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động'}
+                                        </span>
+                                </td>
+                                <td className="actions-cell">
+                                    <button
+                                        className="btn-icon view-btn"
+                                        onClick={() => handleViewDetail(service)}
+                                        title="Xem chi tiết"
+                                    >
+                                        👁️
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    )}
                     </tbody>
                 </table>
             </div>
 
             {/* Pagination */}
-            <div className="pagination">
-                <div className="pagination-info">
-                    Hiển thị {filteredServices.length} trên {pagination.total} dịch vụ
-                </div>
-                <div className="pagination-controls">
-                    <select
-                        value={pagination.pageSize}
-                        onChange={(e) => setPagination(prev => ({ ...prev, pageSize: parseInt(e.target.value) }))}
-                        className="page-size-select"
-                    >
-                        <option value={20}>20 dòng / trang</option>
-                        <option value={50}>50 dòng / trang</option>
-                        <option value={100}>100 dòng / trang</option>
-                    </select>
+            {services.length > 0 && (
+                <div className="pagination">
+                    <div className="pagination-info">
+                        Hiển thị {((pagination.page - 1) * pagination.pageSize + 1).toLocaleString()}-
+                        {Math.min(pagination.page * pagination.pageSize, filteredServices.length).toLocaleString()}
+                        trên {filteredServices.length.toLocaleString()} dịch vụ
+                    </div>
+                    <div className="pagination-controls">
+                        <select
+                            value={pagination.pageSize}
+                            onChange={(e) => setPagination(prev => ({ ...prev, pageSize: parseInt(e.target.value), page: 1 }))}
+                            className="page-size-select"
+                        >
+                            <option value={10}>10 dòng / trang</option>
+                            <option value={20}>20 dòng / trang</option>
+                            <option value={50}>50 dòng / trang</option>
+                            <option value={100}>100 dòng / trang</option>
+                        </select>
 
-                    <div className="page-buttons">
-                        <button className="page-btn" disabled={pagination.page === 1}>
-                            ‹‹
-                        </button>
-                        <span className="page-info">
-                            Trang {pagination.page}
-                        </span>
-                        <button className="page-btn">
-                            ››
-                        </button>
+                        <div className="page-buttons">
+                            <button
+                                className="page-btn"
+                                disabled={pagination.page === 1}
+                                onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+                            >
+                                ‹‹
+                            </button>
+                            <span className="page-info">
+                                Trang {pagination.page} / {totalPages}
+                            </span>
+                            <button
+                                className="page-btn"
+                                disabled={pagination.page >= totalPages}
+                                onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+                            >
+                                ››
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            {/* Service Form Modal */}
-            {showForm && (
-                <ServiceForm
-                    service={selectedService}
-                    onSave={handleSaveService}
-                    onClose={() => setShowForm(false)}
-                />
             )}
 
             {/* Service Detail Drawer */}
@@ -556,192 +494,14 @@ export function ServiceCatalogForm() {
                 <ServiceDetail
                     service={selectedService}
                     onClose={() => setShowDetail(false)}
-                    onEdit={() => {
-                        setShowDetail(false);
-                        setShowForm(true);
-                    }}
                 />
             )}
         </div>
     );
 }
 
-// Service Form Component
-interface ServiceFormProps {
-    service: Service | null;
-    onSave: (data: ServiceFormData) => void;
-    onClose: () => void;
-}
-
-function ServiceForm({ service, onSave, onClose }: ServiceFormProps) {
-    const [formData, setFormData] = useState<ServiceFormData>(service ? {
-        code: service.code,
-        name: service.name,
-        group: service.group,
-        department: service.department,
-        servicePrice: service.servicePrice,
-        insurancePrice: service.insurancePrice,
-        description: service.description || '',
-        status: service.status
-    } : {
-        code: '',
-        name: '',
-        group: '',
-        department: '',
-        servicePrice: 0,
-        insurancePrice: 0,
-        description: '',
-        status: 'active'
-    });
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        onSave(formData);
-    };
-
-    const handleChange = (field: keyof ServiceFormData, value: string | number) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-    };
-
-    const handleNumberChange = (field: keyof ServiceFormData, value: string) => {
-        const numValue = value === '' ? 0 : parseInt(value) || 0;
-        setFormData(prev => ({ ...prev, [field]: numValue }));
-    };
-
-    return (
-        <div className="modal-overlay">
-            <div className="modal-content">
-                <div className="modal-header">
-                    <h2>{service ? 'Sửa dịch vụ' : 'Thêm dịch vụ mới'}</h2>
-                    <button className="close-btn" onClick={onClose}>×</button>
-                </div>
-
-                <form onSubmit={handleSubmit} className="service-form">
-                    <div className="form-grid">
-                        <div className="form-group">
-                            <label>Mã dịch vụ *</label>
-                            <input
-                                type="text"
-                                value={formData.code}
-                                onChange={(e) => handleChange('code', e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label>Tên dịch vụ *</label>
-                            <input
-                                type="text"
-                                value={formData.name}
-                                onChange={(e) => handleChange('name', e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label>Nhóm dịch vụ *</label>
-                            <select
-                                value={formData.group}
-                                onChange={(e) => handleChange('group', e.target.value)}
-                                required
-                            >
-                                <option value="">Chọn nhóm</option>
-                                <option value="Khám bệnh">Khám bệnh</option>
-                                <option value="Xét nghiệm">Xét nghiệm</option>
-                                <option value="Chẩn đoán hình ảnh">Chẩn đoán hình ảnh</option>
-                                <option value="Phẫu thuật">Phẫu thuật</option>
-                            </select>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Khoa *</label>
-                            <select
-                                value={formData.department}
-                                onChange={(e) => handleChange('department', e.target.value)}
-                                required
-                            >
-                                <option value="">Chọn khoa</option>
-                                <option value="Khám bệnh">Khám bệnh</option>
-                                <option value="Xét nghiệm">Xét nghiệm</option>
-                                <option value="Chẩn đoán hình ảnh">Chẩn đoán hình ảnh</option>
-                                <option value="Ngoại khoa">Ngoại khoa</option>
-                            </select>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Giá dịch vụ *</label>
-                            <input
-                                type="number"
-                                value={formData.servicePrice}
-                                onChange={(e) => handleNumberChange('servicePrice', e.target.value)}
-                                min="0"
-                                required
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label>Giá BH *</label>
-                            <input
-                                type="number"
-                                value={formData.insurancePrice}
-                                onChange={(e) => handleNumberChange('insurancePrice', e.target.value)}
-                                min="0"
-                                required
-                            />
-                        </div>
-
-                        <div className="form-group full-width">
-                            <label>Mô tả</label>
-                            <textarea
-                                value={formData.description}
-                                onChange={(e) => handleChange('description', e.target.value)}
-                                // rows="3"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label>Trạng thái</label>
-                            <div className="toggle-group">
-                                <button
-                                    type="button"
-                                    className={`toggle-btn ${formData.status === 'active' ? 'active' : ''}`}
-                                    onClick={() => handleChange('status', 'active')}
-                                >
-                                    Đang hoạt động
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`toggle-btn ${formData.status === 'inactive' ? 'active' : ''}`}
-                                    onClick={() => handleChange('status', 'inactive')}
-                                >
-                                    Ngừng hoạt động
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="form-actions">
-                        <button type="button" className="btn secondary" onClick={onClose}>
-                            Hủy
-                        </button>
-                        <button type="submit" className="btn primary">
-                            {service ? 'Cập nhật' : 'Thêm mới'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    );
-}
-
-// Service Detail Component
-interface ServiceDetailProps {
-    service: Service | null;
-    onClose: () => void;
-    onEdit: () => void;
-}
-
-function ServiceDetail({ service, onClose, onEdit }: ServiceDetailProps) {
+// Service Detail Component (giữ nguyên)
+function ServiceDetail({ service, onClose }: { service: Service | null, onClose: () => void }) {
     if (!service) return null;
 
     return (
@@ -761,8 +521,12 @@ function ServiceDetail({ service, onClose, onEdit }: ServiceDetailProps) {
                                 <span>{service.code}</span>
                             </div>
                             <div className="detail-item">
-                                <label>Tên dịch vụ:</label>
+                                <label>Tên dịch vụ (VN):</label>
                                 <span>{service.name}</span>
+                            </div>
+                            <div className="detail-item">
+                                <label>Tên không dấu (EN):</label>
+                                <span>{service.nameEn}</span>
                             </div>
                             <div className="detail-item">
                                 <label>Nhóm dịch vụ:</label>
@@ -772,12 +536,6 @@ function ServiceDetail({ service, onClose, onEdit }: ServiceDetailProps) {
                                 <label>Khoa:</label>
                                 <span>{service.department}</span>
                             </div>
-                            {service.description && (
-                                <div className="detail-item full-width">
-                                    <label>Mô tả:</label>
-                                    <span>{service.description}</span>
-                                </div>
-                            )}
                         </div>
                     </div>
 
@@ -817,11 +575,8 @@ function ServiceDetail({ service, onClose, onEdit }: ServiceDetailProps) {
                 </div>
 
                 <div className="drawer-actions">
-                    <button className="btn secondary" onClick={onClose}>
+                    <button className="btn primary" onClick={onClose}>
                         Đóng
-                    </button>
-                    <button className="btn primary" onClick={onEdit}>
-                        ✏️ Chỉnh sửa
                     </button>
                 </div>
             </div>
@@ -829,10 +584,9 @@ function ServiceDetail({ service, onClose, onEdit }: ServiceDetailProps) {
     );
 }
 
-const style = document.createElement('style')
-style.innerHTML = `
-:root { 
-/* Service Catalog Styles */
+// CSS Styles (giữ nguyên)
+const serviceCatalogStyles = `
+/* CSS styles từ phiên bản trước - giữ nguyên */
 .service-catalog {
     padding: 20px;
     background: var(--bg-color);
@@ -850,6 +604,53 @@ style.innerHTML = `
     color: var(--text-color);
 }
 
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.api-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+}
+
+.api-status {
+    background: #3b82f6;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.item-count {
+    color: var(--muted-color);
+    font-weight: 500;
+}
+
+.filter-summary {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.filtered-count {
+    color: #0369a1;
+    font-weight: 500;
+}
+
 .toolbar {
     display: flex;
     justify-content: space-between;
@@ -865,9 +666,16 @@ style.innerHTML = `
     flex: 1;
 }
 
+.search-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    min-width: 400px;
+}
+
 .search-box {
     position: relative;
-    min-width: 250px;
+    flex: 1;
 }
 
 .search-icon {
@@ -894,21 +702,24 @@ style.innerHTML = `
     border-color: var(--btn-primary-bg);
 }
 
-.filter-select {
+.language-select, .filter-select {
     padding: 10px 12px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     background: var(--card-bg);
     color: var(--text-color);
     font-size: 14px;
-    min-width: 160px;
     cursor: pointer;
     transition: border-color 0.2s ease;
 }
 
-.filter-select:focus {
-    outline: none;
-    border-color: var(--btn-primary-bg);
+.language-select {
+    font-size: 12px;
+    min-width: 140px;
+}
+
+.filter-select {
+    min-width: 160px;
 }
 
 .action-buttons {
@@ -958,7 +769,56 @@ style.innerHTML = `
     font-size: 16px;
 }
 
-/* Table Styles */
+.error-banner {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.error-banner button {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    color: var(--muted-color);
+}
+
+.loading-state p {
+    margin-top: 16px;
+    font-size: 16px;
+}
+
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border-color);
+    border-top: 3px solid var(--btn-primary-bg);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 .table-container {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -966,6 +826,8 @@ style.innerHTML = `
     overflow: hidden;
     margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    max-height: 600px;
+    overflow-y: auto;
 }
 
 .services-table {
@@ -981,6 +843,9 @@ style.innerHTML = `
     font-weight: 600;
     font-size: 14px;
     border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .services-table td {
@@ -1004,6 +869,11 @@ style.innerHTML = `
 
 .name-cell {
     font-weight: 500;
+}
+
+.name-en-cell {
+    font-style: italic;
+    color: var(--muted-color);
 }
 
 .price-cell {
@@ -1041,14 +911,6 @@ style.innerHTML = `
     color: #3b82f6;
 }
 
-.edit-btn:hover {
-    color: #f59e0b;
-}
-
-.delete-btn:hover {
-    color: #ef4444;
-}
-
 .status-badge {
     padding: 4px 8px;
     border-radius: 12px;
@@ -1067,7 +929,14 @@ style.innerHTML = `
     color: #92400e;
 }
 
-/* Pagination */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted-color);
+    font-style: italic;
+    background: var(--bg-color);
+}
+
 .pagination {
     display: flex;
     justify-content: space-between;
@@ -1129,144 +998,6 @@ style.innerHTML = `
     font-weight: 500;
 }
 
-/* Modal Styles */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 20px;
-}
-
-.modal-content {
-    background: var(--card-bg);
-    border-radius: 12px;
-    width: 100%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.modal-header h2 {
-    margin: 0;
-    font-size: 20px;
-    color: var(--text-color);
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: var(--muted-color);
-    padding: 4px;
-    transition: color 0.2s ease;
-}
-
-.close-btn:hover {
-    color: var(--text-color);
-}
-
-/* Form Styles */
-.service-form {
-    padding: 20px;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.form-group.full-width {
-    grid-column: 1 / -1;
-}
-
-.form-group label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    padding: 10px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background: var(--bg-color);
-    color: var(--text-color);
-    font-size: 14px;
-    transition: border-color 0.2s ease;
-    font-family: inherit;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--btn-primary-bg);
-}
-
-.form-group textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-
-.toggle-group {
-    display: flex;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-.toggle-btn {
-    flex: 1;
-    padding: 10px 12px;
-    border: none;
-    background: var(--bg-color);
-    color: var(--text-color);
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
-}
-
-.toggle-btn.active {
-    background: var(--btn-primary-bg);
-    color: var(--btn-primary-text);
-}
-
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-color);
-}
-
-/* Drawer Styles */
 .drawer-overlay {
     position: fixed;
     top: 0;
@@ -1302,6 +1033,20 @@ style.innerHTML = `
     color: var(--text-color);
 }
 
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--muted-color);
+    padding: 4px;
+    transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+    color: var(--text-color);
+}
+
 .detail-content {
     flex: 1;
     overflow-y: auto;
@@ -1334,12 +1079,6 @@ style.innerHTML = `
     gap: 16px;
 }
 
-.detail-item.full-width {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-}
-
 .detail-item label {
     font-weight: 500;
     color: var(--muted-color);
@@ -1351,10 +1090,6 @@ style.innerHTML = `
     text-align: right;
     color: var(--text-color);
     word-break: break-word;
-}
-
-.detail-item.full-width span {
-    text-align: left;
 }
 
 .detail-item .price {
@@ -1369,56 +1104,26 @@ style.innerHTML = `
     display: flex;
     gap: 12px;
     flex-shrink: 0;
-}
-
-/* Empty State */
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--muted-color);
-}
-
-.empty-state .empty-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-    opacity: 0.5;
-}
-
-.empty-state h3 {
-    margin: 0 0 8px 0;
-    font-size: 18px;
-    color: var(--text-color);
-}
-
-.empty-state p {
-    margin: 0;
-    font-size: 14px;
-}
-
-/* Loading State */
-.loading-state {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 60px 20px;
-}
-
-.loading-spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid var(--border-color);
-    border-top: 3px solid var(--btn-primary-bg);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    justify-content: flex-end;
 }
 
 /* Responsive Design */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
+    .service-catalog {
+        padding: 16px;
+    }
+    
+    .header-top {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
     .toolbar {
         flex-direction: column;
     }
@@ -1427,55 +1132,17 @@ style.innerHTML = `
         width: 100%;
     }
     
-    .search-box {
+    .search-container {
+        min-width: 100%;
+        flex-direction: column;
+    }
+    
+    .language-select {
         min-width: 100%;
     }
     
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .drawer-overlay {
-        width: 400px;
-    }
-}
-
-@media (max-width: 768px) {
-    .service-catalog {
-        padding: 16px;
-    }
-    
-    .pagination {
-        flex-direction: column;
-        gap: 12px;
-        align-items: stretch;
-    }
-    
-    .pagination-controls {
-        justify-content: space-between;
-    }
-    
-    .action-buttons {
-        width: 100%;
-    }
-    
-    .action-buttons .btn {
-        flex: 1;
-        justify-content: center;
-    }
-    
     .drawer-overlay {
         width: 100%;
-    }
-    
-    .modal-content {
-        margin: 0;
-        border-radius: 0;
-        max-height: 100vh;
-    }
-    
-    .modal-overlay {
-        padding: 0;
     }
 }
 
@@ -1488,43 +1155,20 @@ style.innerHTML = `
         min-width: 100%;
     }
     
-    .actions-cell {
+    .pagination {
         flex-direction: column;
-        gap: 4px;
+        gap: 12px;
     }
     
-    .actions-cell .btn-icon {
-        width: 28px;
-        height: 28px;
-        font-size: 14px;
-    }
-    
-    .detail-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-    }
-    
-    .detail-item label {
-        min-width: auto;
-    }
-    
-    .detail-item span {
-        text-align: left;
+    .pagination-controls {
+        justify-content: space-between;
+        width: 100%;
     }
 }
 
-/* Dark Theme Enhancements */
+/* Dark Theme */
 [data-theme="dark"] .table-container {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="dark"] .modal-content {
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-}
-
-[data-theme="dark"] .drawer-overlay {
-    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="dark"] .status-badge.active {
@@ -1537,28 +1181,17 @@ style.innerHTML = `
     color: #fbbf24;
 }
 
-/* Scrollbar Styling */
-.detail-content::-webkit-scrollbar,
-.modal-content::-webkit-scrollbar {
-    width: 6px;
+[data-theme="dark"] .filter-summary {
+    background: rgba(56, 189, 248, 0.1);
+    border-color: rgba(56, 189, 248, 0.3);
 }
 
-.detail-content::-webkit-scrollbar-track,
-.modal-content::-webkit-scrollbar-track {
-    background: transparent;
+[data-theme="dark"] .filtered-count {
+    color: #7dd3fc;
 }
+`;
 
-.detail-content::-webkit-scrollbar-thumb,
-.modal-content::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 3px;
-}
-
-.detail-content::-webkit-scrollbar-thumb:hover,
-.modal-content::-webkit-scrollbar-thumb:hover {
-    background: var(--muted-color);
-}
- }
-
-`
-document.head.appendChild(style)
+// Inject styles
+const style = document.createElement('style');
+style.innerHTML = serviceCatalogStyles;
+document.head.appendChild(style);

@@ -189,13 +189,7 @@ export function RegistrationPage({ makeUseCase }: { makeUseCase: () => RegisterV
       case 'services':
         return <ServiceCatalogForm />
 
-      default:
-        return (
-            <div className="card">
-              <h3 style={{marginTop:0}}>Đang phát triển</h3>
-              <p className="muted">Bạn đang ở mục: <b>{activeMenu}</b>.</p>
-            </div>
-        )
+
     }
   }
 
@@ -207,7 +201,6 @@ export function RegistrationPage({ makeUseCase }: { makeUseCase: () => RegisterV
             collapsed={collapsed}
             onToggle={() => setCollapsed((v) => !v)}
         />
-
 
         <div className="content">
           <header className="sticky blue-header">
