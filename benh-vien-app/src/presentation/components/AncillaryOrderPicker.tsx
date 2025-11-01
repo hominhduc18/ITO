@@ -90,7 +90,7 @@ export function AncillaryOrderPicker({ chosen, onAdd, onRemove, onUpdate, errors
 
             const data: APIService[] = await response.json()
 
-            // Chuyển đổi dữ liệu từ API sang format cần thiết
+
             const convertedServices: ServiceCatalogItem[] = data.map(apiService => ({
                 id: apiService.maDichVu,
                 name: apiService.tenDichVu,
@@ -106,7 +106,7 @@ export function AncillaryOrderPicker({ chosen, onAdd, onRemove, onUpdate, errors
         } catch (err) {
             console.error('Error fetching service catalog:', err)
             setError('Không thể tải danh mục dịch vụ')
-            // Fallback to empty array
+
             setServiceCatalog([])
         } finally {
             setLoading(false)
@@ -121,7 +121,7 @@ export function AncillaryOrderPicker({ chosen, onAdd, onRemove, onUpdate, errors
             result = searchServices(result, search);
         }
 
-        // Áp dụng filter category
+
         if (category) {
             result = result.filter(s => s.category === category);
         }
