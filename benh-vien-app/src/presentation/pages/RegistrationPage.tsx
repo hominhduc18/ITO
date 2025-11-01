@@ -7,6 +7,8 @@ import type { RegisterVisit } from '@application/usecases/RegisterVisit'
 import { isPhone } from '@shared/utils/validation'
 import { Dashboard } from "@presentation/components/DashboardForm"
 import { ServiceCatalogForm} from "@presentation/components/ServiceCatalog";
+import {Payment} from "@presentation/components/Payment";
+import DoctorSchedule from "@presentation/components/DoctorSchedule";
 
 // Hook quản lý theme
 const useTheme = () => {
@@ -24,12 +26,12 @@ const useTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
-  return { theme, toggleTheme };
+  return {theme, toggleTheme};
 };
 
 // Component chuyển đổi theme
 function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const {theme, toggleTheme} = useTheme();
 
   return (
       <button
@@ -55,16 +57,19 @@ function Sidebar({
   onToggle: () => void
 }) {
   const items = [
-    { key: 'dashboard', label: 'Tổng quan' },
-    { key: 'registration', label: 'Tiếp nhận & CLS' },
-    { key: 'services', label: 'Danh mục dịch vụ' },
-    { key: 'reports', label: 'Báo cáo' },
-    { key: 'settings', label: 'Cấu hình' },
+    {key: 'dashboard', label: 'Tổng quan'},
+    {key: 'registration', label: 'Tiếp nhận & CLS'},
+    {key: 'payment', label: 'Thanh Toán'},
+    {key: 'DoctorSchedule', label: 'Lịch làm việc của Bác Sĩ'},
+    {key: 'services', label: 'Danh mục dịch vụ'},
+    {key: 'reports', label: 'Báo cáo'},
+    {key: 'settings', label: 'Cấu hình'},
+
   ]
   return (
       <aside className={`sidebar-fixed ${collapsed ? 'is-collapsed' : ''}`}>
         <div className="sidebar__header">
-          <div className="logo" />
+          <div className="logo"/>
           {!collapsed && (
               <div className="brand">
                 <div className="brand__name">SAIGON-ITO</div>
@@ -93,35 +98,48 @@ function Sidebar({
   )
 }
 
-export function RegistrationPage({ makeUseCase }: { makeUseCase: () => RegisterVisit }) {
-  const { submit, loading, error, registrationId } = useRegistrationController(makeUseCase)
-  const [patient, setPatient] = React.useState<any>(() => ({ fullName:'', dob:'', gender:'', nationalId:'', phone:'', insurance:'', address:'' }))
-  const [appointment, setAppointment] = React.useState<any>(() => ({ department:'', preferredDate:'', preferredTime:'', symptoms:'' }))
+export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVisit }) {
+  const {submit, loading, error, registrationId} = useRegistrationController(makeUseCase)
+  const [patient, setPatient] = React.useState<any>(() => ({
+    fullName: '',
+    dob: '',
+    gender: '',
+    nationalId: '',
+    phone: '',
+    insurance: '',
+    address: ''
+  }))
+  const [appointment, setAppointment] = React.useState<any>(() => ({
+    department: '',
+    preferredDate: '',
+    preferredTime: '',
+    symptoms: ''
+  }))
   const [orders, setOrders] = React.useState<any[]>([])
   const [errors, setErrors] = React.useState<any>({})
   const [activeMenu, setActiveMenu] = React.useState('dashboard') // Mặc định là dashboard
   const [collapsed, setCollapsed] = React.useState(false)
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     const saved = localStorage.getItem('reg-form')
     if (saved) {
       const parsed = JSON.parse(saved)
-      setPatient(parsed.patient||{})
-      setAppointment(parsed.appointment||{})
-      setOrders(parsed.orders||[])
+      setPatient(parsed.patient || {})
+      setAppointment(parsed.appointment || {})
+      setOrders(parsed.orders || [])
     }
-  },[])
+  }, [])
 
-  React.useEffect(()=>{
-    localStorage.setItem('reg-form', JSON.stringify({ patient, appointment, orders }))
-  },[patient, appointment, orders])
+  React.useEffect(() => {
+    localStorage.setItem('reg-form', JSON.stringify({patient, appointment, orders}))
+  }, [patient, appointment, orders])
 
   function validate() {
-    const e:any = {}
+    const e: any = {}
     if (!patient.fullName?.trim()) e.fullName = 'Vui lòng nhập họ tên'
     if (!patient.dob) e.dob = 'Chọn ngày sinh'
     if (!patient.gender) e.gender = 'Chọn giới tính'
-    if (!isPhone(patient.phone||'')) e.phone = 'SĐT 8-15 chữ số'
+    if (!isPhone(patient.phone || '')) e.phone = 'SĐT 8-15 chữ số'
     if (!appointment.department) e.department = 'Chọn khoa khám'
     if (!appointment.preferredDate) e.preferredDate = 'Chọn ngày'
     if (!appointment.preferredTime) e.preferredTime = 'Chọn giờ'
@@ -130,19 +148,28 @@ export function RegistrationPage({ makeUseCase }: { makeUseCase: () => RegisterV
     return Object.keys(e).length === 0
   }
 
-  function onAdd(s:any) {
-    setOrders(prev => prev.some(o=>o.id===s.id) ? prev : [...prev, { id:s.id, name:s.name, category:s.category, priority:'routine', note:'' }])
+  function onAdd(s: any) {
+    setOrders(prev => prev.some(o => o.id === s.id) ? prev : [...prev, {
+      id: s.id,
+      name: s.name,
+      category: s.category,
+      priority: 'routine',
+      note: ''
+    }])
   }
-  function onRemove(id:string) {
-    setOrders(prev => prev.filter(o=>o.id!==id))
+
+  function onRemove(id: string) {
+    setOrders(prev => prev.filter(o => o.id !== id))
   }
-  function onUpdate(id:string, patch:any) {
-    setOrders(prev => prev.map(o=>o.id===id?{...o, ...patch}:o))
+
+  function onUpdate(id: string, patch: any) {
+    setOrders(prev => prev.map(o => o.id === id ? {...o, ...patch} : o))
   }
-  function resetAll(){
+
+  function resetAll() {
     localStorage.removeItem('reg-form')
-    setPatient({ fullName:'', dob:'', gender:'', nationalId:'', phone:'', insurance:'', address:'' })
-    setAppointment({ department:'', preferredDate:'', preferredTime:'', symptoms:'' })
+    setPatient({fullName: '', dob: '', gender: '', nationalId: '', phone: '', insurance: '', address: ''})
+    setAppointment({department: '', preferredDate: '', preferredTime: '', symptoms: ''})
     setOrders([])
     setErrors({})
   }
@@ -150,9 +177,9 @@ export function RegistrationPage({ makeUseCase }: { makeUseCase: () => RegisterV
   async function onSubmit() {
     if (!validate()) return
     const dto = {
-      patient: { ...patient },
-      appointment: { ...appointment },
-      orders: orders.map(o=>({ id:o.id, name:o.name, category:o.category, priority:o.priority, note:o.note })),
+      patient: {...patient},
+      appointment: {...appointment},
+      orders: orders.map(o => ({id: o.id, name: o.name, category: o.category, priority: o.priority, note: o.note})),
     }
     await submit(dto as any)
   }
@@ -160,35 +187,47 @@ export function RegistrationPage({ makeUseCase }: { makeUseCase: () => RegisterV
   const renderContent = () => {
     switch (activeMenu) {
       case 'dashboard':
-        return <Dashboard />
+        return <Dashboard/>
       case 'registration':
         return (
             <>
-              <div style={{display:'grid', gap:16, gridTemplateColumns:'1fr'}}>
-                <PatientForm value={patient} onChange={(p:any)=>setPatient((prev:any)=>({ ...prev, ...p }))} errors={errors} />
-                <AppointmentForm value={appointment} onChange={(p:any)=>setAppointment((prev:any)=>({ ...prev, ...p }))} errors={errors} />
+              <div style={{display: 'grid', gap: 16, gridTemplateColumns: '1fr'}}>
+                <PatientForm value={patient} onChange={(p: any) => setPatient((prev: any) => ({...prev, ...p}))}
+                             errors={errors}/>
+                <AppointmentForm value={appointment}
+                                 onChange={(p: any) => setAppointment((prev: any) => ({...prev, ...p}))}
+                                 errors={errors}/>
               </div>
               <div>
-                <AncillaryOrderPicker chosen={orders} onAdd={onAdd} onRemove={onRemove} onUpdate={onUpdate} errors={errors} />
-                <div style={{display:'flex', gap:12, marginTop:12}}>
+                <AncillaryOrderPicker chosen={orders} onAdd={onAdd} onRemove={onRemove} onUpdate={onUpdate}
+                                      errors={errors}/>
+                <div style={{display: 'flex', gap: 12, marginTop: 12}}>
                   <button className="btn primary" onClick={onSubmit} disabled={loading}>Gửi đăng ký</button>
                   <button className="btn" onClick={resetAll}>Xóa hết</button>
                 </div>
-                {error && <div className="error" style={{marginTop:8}}>{error}</div>}
-                {registrationId && <div className="ok" style={{marginTop:8}}>Mã tiếp nhận: {registrationId}</div>}
+                {error && <div className="error" style={{marginTop: 8}}>{error}</div>}
+                {registrationId && <div className="ok" style={{marginTop: 8}}>Mã tiếp nhận: {registrationId}</div>}
               </div>
 
               {registrationId && (
                   <div className="card">
                     <h3>Xem lại yêu cầu (payload demo)</h3>
-                    <pre className="json">{JSON.stringify({ patient, appointment, orders, submittedAt: new Date().toISOString() }, null, 2)}</pre>
+                    <pre className="json">{JSON.stringify({
+                      patient,
+                      appointment,
+                      orders,
+                      submittedAt: new Date().toISOString()
+                    }, null, 2)}</pre>
                   </div>
               )}
             </>
         )
       case 'services':
-        return <ServiceCatalogForm />
-
+        return <ServiceCatalogForm/>
+      case 'payment':
+        return <Payment/>
+      case 'DoctorSchedule':
+        return <DoctorSchedule/>
 
     }
   }

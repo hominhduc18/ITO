@@ -379,7 +379,7 @@ export function ServiceCatalogForm() {
                     </div>
                 </div>
 
-                {/* Filter summary */}
+
                 {(filters.search || filters.group || filters.department) && (
                     <div className="filter-summary">
                         <span className="filtered-count">
@@ -389,7 +389,7 @@ export function ServiceCatalogForm() {
                 )}
             </div>
 
-            {/* Services Table */}
+
             <div className="table-container">
                 <table className="services-table">
                     <thead>
@@ -400,7 +400,7 @@ export function ServiceCatalogForm() {
                         <th>Nhóm</th>
                         <th>Khoa</th>
                         <th>Giá DV</th>
-                        <th>Giá BHYT</th>
+                        <th>Giá BH</th>
                         <th>Trạng thái</th>
                         <th>Hành động</th>
                     </tr>
@@ -489,7 +489,7 @@ export function ServiceCatalogForm() {
                 </div>
             )}
 
-            {/* Service Detail Drawer */}
+
             {showDetail && (
                 <ServiceDetail
                     service={selectedService}
@@ -500,7 +500,7 @@ export function ServiceCatalogForm() {
     );
 }
 
-// Service Detail Component (giữ nguyên)
+
 function ServiceDetail({ service, onClose }: { service: Service | null, onClose: () => void }) {
     if (!service) return null;
 
@@ -584,7 +584,7 @@ function ServiceDetail({ service, onClose }: { service: Service | null, onClose:
     );
 }
 
-// CSS Styles (giữ nguyên)
+
 const serviceCatalogStyles = `
 /* CSS styles từ phiên bản trước - giữ nguyên */
 .service-catalog {
