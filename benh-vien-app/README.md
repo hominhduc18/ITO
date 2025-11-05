@@ -1,6 +1,6 @@
-# ITO Clinic Intake (Clean Architecture, Vite + React + TS)
+# ITO  (Clean Architecture, Vite + React + TS)
 
-Giao diện tiếp nhận đăng ký khám & chỉ định cận lâm sàng, tách lớp theo Clean Architecture.
+
 
 ## Chạy nhanh
 ```bash
