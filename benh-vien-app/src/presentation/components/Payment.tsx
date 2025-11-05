@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 
 // Mock data
 const MOCK_PATIENTS = [
@@ -44,10 +44,32 @@ const MOCK_PATIENTS = [
     }
 ];
 
+// Theme Context
+const ThemeContext = React.createContext({
+    isDarkMode: false,
+    toggleTheme: () => {}
+});
+
+// Theme Toggle Component
+function ThemeToggle() {
+    const { isDarkMode, toggleTheme } = React.useContext(ThemeContext);
+
+    return (
+        <button
+            className="theme-toggle"
+            onClick={toggleTheme}
+            aria-label={isDarkMode ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}
+        >
+            {isDarkMode ? '🌙' : '☀️'}
+        </button>
+    );
+}
+
 // Component VietQR
 function VietQRPayment({ amount, patient, onSuccess }: { amount: number; patient: any; onSuccess: () => void }) {
     const [showQR, setShowQR] = useState(false);
     const [isPaid, setIsPaid] = useState(false);
+    const { isDarkMode } = React.useContext(ThemeContext);
 
     const generateVietQRUrl = () => {
         const bankAccount = '1014980733'
@@ -80,7 +102,7 @@ function VietQRPayment({ amount, patient, onSuccess }: { amount: number; patient
 
             {!showQR ? (
                 <div className="vietqr-setup">
-                    <div className="bank-info">
+                    <div className={`bank-info ${isDarkMode ? 'dark' : ''}`}>
                         <h4>Thông tin ngân hàng</h4>
                         <div className="bank-details">
                             <div className="detail-item">
@@ -127,7 +149,7 @@ function VietQRPayment({ amount, patient, onSuccess }: { amount: number; patient
                                 </div>
                             </div>
 
-                            <div className="payment-steps">
+                            <div className={`payment-steps ${isDarkMode ? 'dark' : ''}`}>
                                 <h4>Hướng dẫn thanh toán:</h4>
                                 <ol>
                                     <li>Mở app ngân hàng trên điện thoại</li>
@@ -138,13 +160,13 @@ function VietQRPayment({ amount, patient, onSuccess }: { amount: number; patient
                             </div>
 
                             <div className="payment-status">
-                                <div className="status-waiting">
+                                <div className={`status-waiting ${isDarkMode ? 'dark' : ''}`}>
                                     ⏳ Đang chờ thanh toán...
                                 </div>
                             </div>
                         </>
                     ) : (
-                        <div className="payment-success">
+                        <div className={`payment-success ${isDarkMode ? 'dark' : ''}`}>
                             <div className="success-icon">✅</div>
                             <h3>Thanh toán thành công!</h3>
                             <p>Số tiền: <strong>{amount.toLocaleString()}đ</strong></p>
@@ -176,14 +198,15 @@ function PaymentForm({
     setPaymentMethod: (method: string) => void;
     onPayment: () => void;
 }) {
+    const { isDarkMode } = React.useContext(ThemeContext);
     const remaining = patient.total - patient.paid;
     const isFullPayment = paymentAmount >= remaining;
 
     return (
-        <div className="payment-form">
+        <div className={`payment-form ${isDarkMode ? 'dark' : ''}`}>
             <h2>Thông tin thanh toán</h2>
 
-            <div className="patient-summary">
+            <div className={`patient-summary ${isDarkMode ? 'dark' : ''}`}>
                 <h3>Bệnh nhân: {patient.name}</h3>
                 <p>Mã BN: {patient.id} | SĐT: {patient.phone}</p>
             </div>
@@ -198,7 +221,7 @@ function PaymentForm({
                 ))}
             </div>
 
-            <div className="payment-summary">
+            <div className={`payment-summary ${isDarkMode ? 'dark' : ''}`}>
                 <div className="summary-row">
                     <label>Tổng tiền:</label>
                     <span>{patient.total.toLocaleString()}đ</span>
@@ -222,7 +245,7 @@ function PaymentForm({
                         onChange={(e) => setPaymentAmount(Number(e.target.value))}
                         min="0"
                         max={remaining}
-                        className="amount-input"
+                        className={`amount-input ${isDarkMode ? 'dark' : ''}`}
                     />
                     <div className="amount-buttons">
                         <button
@@ -247,7 +270,7 @@ function PaymentForm({
                     <select
                         value={paymentMethod}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="method-select"
+                        className={`method-select ${isDarkMode ? 'dark' : ''}`}
                     >
                         <option value="cash">💵 Tiền mặt</option>
                         <option value="vietqr">📱 VietQR</option>
@@ -257,7 +280,7 @@ function PaymentForm({
                     </select>
 
                     {paymentMethod === 'vietqr' && (
-                        <div className="method-info">
+                        <div className={`method-info ${isDarkMode ? 'dark' : ''}`}>
                             <p>📱 Quét mã QR để thanh toán nhanh qua app ngân hàng</p>
                         </div>
                     )}
@@ -297,6 +320,7 @@ function InvoicePreview({
     onPrint: () => void;
     onNewPayment: () => void;
 }) {
+    const { isDarkMode } = React.useContext(ThemeContext);
     const paymentDate = new Date().toLocaleString('vi-VN');
     const remaining = patient.total - patient.paid - paymentAmount;
 
@@ -312,13 +336,13 @@ function InvoicePreview({
     };
 
     return (
-        <div className="invoice-preview">
+        <div className={`invoice-preview ${isDarkMode ? 'dark' : ''}`}>
             <div className="invoice-header">
                 <h2>HÓA ĐƠN THANH TOÁN</h2>
                 <p>BỆNH VIỆN SAIGON ITO</p>
             </div>
 
-            <div className="invoice-info">
+            <div className={`invoice-info ${isDarkMode ? 'dark' : ''}`}>
                 <div className="info-row">
                     <label>Mã hóa đơn:</label>
                     <span>HD{Date.now().toString().slice(-6)}</span>
@@ -347,7 +371,7 @@ function InvoicePreview({
                 ))}
             </div>
 
-            <div className="payment-summary">
+            <div className={`payment-summary ${isDarkMode ? 'dark' : ''}`}>
                 <div className="summary-row">
                     <label>Tổng tiền:</label>
                     <span>{patient.total.toLocaleString()}đ</span>
@@ -400,6 +424,35 @@ export function Payment() {
     const [filterStatus, setFilterStatus] = useState('all');
     const [showInvoice, setShowInvoice] = useState(false);
     const [showVietQR, setShowVietQR] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(true);
+
+    // Load theme from localStorage
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('payment-theme');
+        if (savedTheme) {
+            setIsDarkMode(savedTheme === 'dark');
+        } else {
+            // Auto detect system preference
+            // const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            // setIsDarkMode(prefersDark);
+
+            setIsDarkMode(true);
+        }
+    }, []);
+
+    // Apply theme to document
+    useEffect(() => {
+        if (isDarkMode) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+        localStorage.setItem('payment-theme', isDarkMode ? 'dark' : 'light');
+    }, [isDarkMode]);
+
+    const toggleTheme = () => {
+        setIsDarkMode(!isDarkMode);
+    };
 
     // Filter patients based on search and status
     const filteredPatients = patients.filter(patient => {
@@ -475,162 +528,249 @@ export function Payment() {
 
     const getStatusColor = (status: string) => {
         switch(status) {
-            case 'pending': return '#dc2626';
-            case 'partial': return '#d97706';
-            case 'paid': return '#059669';
-            default: return '#6b7280';
+            case 'pending': return isDarkMode ? '#ef4444' : '#dc2626';
+            case 'partial': return isDarkMode ? '#f59e0b' : '#d97706';
+            case 'paid': return isDarkMode ? '#10b981' : '#059669';
+            default: return isDarkMode ? '#6b7280' : '#6b7280';
         }
     };
 
     return (
-        <div className="payment-system">
-            <div className="payment-header">
-                <h1>Hệ Thống Thanh Toán</h1>
-                <p className="subtitle">Quản lý và xử lý thanh toán dịch vụ y tế</p>
-            </div>
-
-            <div className="payment-layout">
-                {/* Left Panel - Danh sách bệnh nhân */}
-                <div className="patients-panel">
-                    <div className="panel-header">
-                        <h3>Danh sách bệnh nhân</h3>
-                        <div className="filters">
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm bệnh nhân..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="search-input"
-                            />
-                            <select
-                                value={filterStatus}
-                                onChange={(e) => setFilterStatus(e.target.value)}
-                                className="status-filter"
-                            >
-                                <option value="all">Tất cả</option>
-                                <option value="pending">Chưa thanh toán</option>
-                                <option value="partial">Một phần</option>
-                                <option value="paid">Đã thanh toán</option>
-                            </select>
-                        </div>
+        <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+            <div className={`payment-system ${isDarkMode ? 'dark' : ''}`}>
+                <div className="payment-header">
+                    <div className="header-content">
+                        <h1>Hệ Thống Thanh Toán</h1>
                     </div>
+                    <div className="header-actions">
+                        <ThemeToggle />
+                    </div>
+                </div>
 
-                    <div className="patients-list">
-                        {filteredPatients.map(patient => (
-                            <div
-                                key={patient.id}
-                                className={`patient-card ${
-                                    selectedPatient?.id === patient.id ? 'selected' : ''
-                                }`}
-                                onClick={() => handlePatientSelect(patient)}
-                            >
-                                <div className="patient-info">
-                                    <h4>{patient.name}</h4>
-                                    <p>Mã BN: {patient.id} | SĐT: {patient.phone}</p>
-                                    <div className="patient-meta">
-                                        <span className="total-amount">
-                                            Tổng: {patient.total.toLocaleString()}đ
-                                        </span>
-                                        <span
-                                            className="status-badge"
-                                            style={{ backgroundColor: getStatusColor(patient.status) }}
-                                        >
-                                            {getStatusText(patient.status)}
-                                        </span>
+                <div className="payment-layout">
+                    {/* Left Panel - Danh sách bệnh nhân */}
+                    <div className={`patients-panel ${isDarkMode ? 'dark' : ''}`}>
+                        <div className="panel-header">
+                            <h3>Danh sách bệnh nhân</h3>
+                            <div className="filters">
+                                <input
+                                    type="text"
+                                    placeholder="Tìm kiếm bệnh nhân..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className={`search-input ${isDarkMode ? 'dark' : ''}`}
+                                />
+                                <select
+                                    value={filterStatus}
+                                    onChange={(e) => setFilterStatus(e.target.value)}
+                                    className={`status-filter ${isDarkMode ? 'dark' : ''}`}
+                                >
+                                    <option value="all">Tất cả trạng thái</option>
+                                    <option value="pending">Chưa thanh toán</option>
+                                    <option value="partial">Một phần</option>
+                                    <option value="paid">Đã thanh toán</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="patients-list">
+                            {filteredPatients.map(patient => (
+                                <div
+                                    key={patient.id}
+                                    className={`patient-card ${isDarkMode ? 'dark' : ''} ${
+                                        selectedPatient?.id === patient.id ? 'selected' : ''
+                                    }`}
+                                    onClick={() => handlePatientSelect(patient)}
+                                >
+                                    <div className="patient-info">
+                                        <h4>{patient.name}</h4>
+                                        <p>Mã BN: {patient.id} | SĐT: {patient.phone}</p>
+                                        <div className="patient-meta">
+                                            <span className="total-amount">
+                                                Tổng: {patient.total.toLocaleString()}đ
+                                            </span>
+                                            <span
+                                                className="status-badge"
+                                                style={{ backgroundColor: getStatusColor(patient.status) }}
+                                            >
+                                                {getStatusText(patient.status)}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Right Panel - Thanh toán & Hóa đơn */}
+                    <div className="payment-panel">
+                        {!selectedPatient ? (
+                            <div className={`empty-selection ${isDarkMode ? 'dark' : ''}`}>
+                                <div className="empty-icon">💰</div>
+                                <h3>Chọn bệnh nhân để thanh toán</h3>
+                                <p>Nhấp vào bệnh nhân từ danh sách bên trái để bắt đầu quy trình thanh toán</p>
                             </div>
-                        ))}
+                        ) : showVietQR ? (
+                            <VietQRPayment
+                                amount={paymentAmount}
+                                patient={selectedPatient}
+                                onSuccess={handleVietQRSuccess}
+                            />
+                        ) : showInvoice ? (
+                            <InvoicePreview
+                                patient={selectedPatient}
+                                paymentAmount={paymentAmount}
+                                paymentMethod={paymentMethod}
+                                onPrint={handlePrintInvoice}
+                                onNewPayment={handleNewPayment}
+                            />
+                        ) : (
+                            <PaymentForm
+                                patient={selectedPatient}
+                                paymentAmount={paymentAmount}
+                                setPaymentAmount={setPaymentAmount}
+                                paymentMethod={paymentMethod}
+                                setPaymentMethod={setPaymentMethod}
+                                onPayment={handlePayment}
+                            />
+                        )}
                     </div>
                 </div>
-
-                {/* Right Panel - Thanh toán & Hóa đơn */}
-                <div className="payment-panel">
-                    {!selectedPatient ? (
-                        <div className="empty-selection">
-                            <div className="empty-icon">💰</div>
-                            <h3>Chọn bệnh nhân để thanh toán</h3>
-                            <p>Nhấp vào bệnh nhân từ danh sách bên trái để bắt đầu quy trình thanh toán</p>
-                        </div>
-                    ) : showVietQR ? (
-                        <VietQRPayment
-                            amount={paymentAmount}
-                            patient={selectedPatient}
-                            onSuccess={handleVietQRSuccess}
-                        />
-                    ) : showInvoice ? (
-                        <InvoicePreview
-                            patient={selectedPatient}
-                            paymentAmount={paymentAmount}
-                            paymentMethod={paymentMethod}
-                            onPrint={handlePrintInvoice}
-                            onNewPayment={handleNewPayment}
-                        />
-                    ) : (
-                        <PaymentForm
-                            patient={selectedPatient}
-                            paymentAmount={paymentAmount}
-                            setPaymentAmount={setPaymentAmount}
-                            paymentMethod={paymentMethod}
-                            setPaymentMethod={setPaymentMethod}
-                            onPayment={handlePayment}
-                        />
-                    )}
-                </div>
             </div>
-        </div>
+        </ThemeContext.Provider>
     );
 }
 
-
 const paymentStyles = `
+/* Light Theme (Default) */
 .payment-system {
     min-height: 100vh;
     background: #f8fafc;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: all 0.3s ease;
+}
+
+/* Dark Theme */
+.payment-system.dark {
+    background: #0f172a;
+    color: #e2e8f0;
 }
 
 .payment-header {
     background: white;
-    padding: 20px;
+    padding: 16px 24px;
     border-bottom: 1px solid #e2e8f0;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .payment-header {
+    background: #1e293b;
+    border-bottom-color: #334155;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .payment-header h1 {
     margin: 0;
     color: #1e293b;
-    font-size: 24px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.payment-system.dark .payment-header h1 {
+    color: #f1f5f9;
 }
 
 .subtitle {
     margin: 4px 0 0 0;
     color: #64748b;
-    font-size: 14px;
+    font-size: 13px;
+}
+
+.payment-system.dark .subtitle {
+    color: #94a3b8;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.theme-toggle {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+    background: #e2e8f0;
+    transform: scale(1.05);
+}
+
+.payment-system.dark .theme-toggle {
+    background: #334155;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+
+.payment-system.dark .theme-toggle:hover {
+    background: #475569;
 }
 
 .payment-layout {
     display: flex;
-    height: calc(100vh - 80px);
+    height: calc(100vh - 73px);
+    gap: 0;
 }
 
 .patients-panel {
-    width: 400px;
+    width: 380px;
+    min-width: 380px;
     background: white;
     border-right: 1px solid #e2e8f0;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .patients-panel {
+    background: #1e293b;
+    border-right-color: #334155;
 }
 
 .panel-header {
     padding: 20px;
     border-bottom: 1px solid #e2e8f0;
+    background: #fafbfc;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .panel-header {
+    background: #1e293b;
+    border-bottom-color: #334155;
 }
 
 .panel-header h3 {
     margin: 0 0 16px 0;
     color: #1e293b;
-    font-size: 18px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.payment-system.dark .panel-header h3 {
+    color: #f1f5f9;
 }
 
 .filters {
@@ -640,10 +780,12 @@ const paymentStyles = `
 }
 
 .search-input, .status-filter {
-    padding: 8px 12px;
+    padding: 10px 12px;
     border: 1px solid #d1d5db;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 14px;
+    background: white;
+    transition: all 0.3s ease;
 }
 
 .search-input:focus, .status-filter:focus {
@@ -652,10 +794,27 @@ const paymentStyles = `
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.payment-system.dark .search-input,
+.payment-system.dark .status-filter {
+    background: #334155;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+
+.payment-system.dark .search-input:focus,
+.payment-system.dark .status-filter:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.payment-system.dark .search-input::placeholder {
+    color: #94a3b8;
+}
+
 .patients-list {
     flex: 1;
     overflow-y: auto;
-    padding: 8px;
+    padding: 12px;
 }
 
 .patient-card {
@@ -664,29 +823,58 @@ const paymentStyles = `
     border-radius: 8px;
     margin-bottom: 8px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
+    background: white;
 }
 
 .patient-card:hover {
     border-color: #3b82f6;
     background: #f8fafc;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .patient-card.selected {
     border-color: #3b82f6;
     background: #eff6ff;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.payment-system.dark .patient-card {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+.payment-system.dark .patient-card:hover {
+    background: #334155;
+    border-color: #3b82f6;
+}
+
+.payment-system.dark .patient-card.selected {
+    background: #1e3a8a;
+    border-color: #3b82f6;
 }
 
 .patient-info h4 {
     margin: 0 0 4px 0;
     color: #1e293b;
-    font-size: 16px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.payment-system.dark .patient-info h4 {
+    color: #f1f5f9;
 }
 
 .patient-info p {
     margin: 0 0 8px 0;
     color: #64748b;
     font-size: 12px;
+}
+
+.payment-system.dark .patient-info p {
+    color: #94a3b8;
 }
 
 .patient-meta {
@@ -698,21 +886,35 @@ const paymentStyles = `
 .total-amount {
     font-weight: 600;
     color: #1e293b;
-    font-size: 14px;
+    font-size: 13px;
+}
+
+.payment-system.dark .total-amount {
+    color: #f1f5f9;
 }
 
 .status-badge {
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 12px;
     color: white;
     font-size: 11px;
     font-weight: 500;
+    min-width: 80px;
+    text-align: center;
 }
 
 .payment-panel {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
+    background: #f8fafc;
+    display: flex;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .payment-panel {
+    background: #0f172a;
 }
 
 .empty-selection {
@@ -723,36 +925,68 @@ const paymentStyles = `
     height: 100%;
     text-align: center;
     color: #64748b;
+    max-width: 400px;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .empty-selection {
+    color: #94a3b8;
 }
 
 .empty-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.7;
 }
 
 .empty-selection h3 {
-    margin: 0 0 8px 0;
+    margin: 0 0 12px 0;
     color: #374151;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.payment-system.dark .empty-selection h3 {
+    color: #e2e8f0;
 }
 
 .empty-selection p {
     margin: 0;
     font-size: 14px;
+    line-height: 1.5;
 }
 
 .payment-form {
     background: white;
     padding: 24px;
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
     margin: 0 auto;
+    height: fit-content;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .payment-form {
+    background: #1e293b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    color: #e2e8f0;
 }
 
 .payment-form h2 {
     margin: 0 0 20px 0;
     color: #1e293b;
-    font-size: 20px;
+    font-size: 18px;
+    font-weight: 700;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 12px;
+}
+
+.payment-system.dark .payment-form h2 {
+    color: #f1f5f9;
+    border-bottom-color: #334155;
 }
 
 .patient-summary {
@@ -760,17 +994,34 @@ const paymentStyles = `
     padding: 16px;
     border-radius: 8px;
     margin-bottom: 20px;
+    border-left: 4px solid #3b82f6;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .patient-summary {
+    background: #334155;
+    border-left-color: #3b82f6;
 }
 
 .patient-summary h3 {
     margin: 0 0 4px 0;
     color: #1e293b;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.payment-system.dark .patient-summary h3 {
+    color: #f1f5f9;
 }
 
 .patient-summary p {
     margin: 0;
     color: #64748b;
-    font-size: 14px;
+    font-size: 13px;
+}
+
+.payment-system.dark .patient-summary p {
+    color: #94a3b8;
 }
 
 .services-list {
@@ -780,15 +1031,24 @@ const paymentStyles = `
 .services-list h4 {
     margin: 0 0 12px 0;
     color: #374151;
-    font-size: 16px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.payment-system.dark .services-list h4 {
+    color: #e2e8f0;
 }
 
 .service-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0;
+    padding: 10px 0;
     border-bottom: 1px solid #f1f5f9;
+}
+
+.payment-system.dark .service-item {
+    border-bottom-color: #334155;
 }
 
 .service-item:last-child {
@@ -797,12 +1057,24 @@ const paymentStyles = `
 
 .service-name {
     color: #475569;
-    font-size: 14px;
+    font-size: 13px;
+    flex: 1;
+}
+
+.payment-system.dark .service-name {
+    color: #cbd5e1;
 }
 
 .service-price {
     font-weight: 600;
     color: #1e293b;
+    font-size: 13px;
+    min-width: 80px;
+    text-align: right;
+}
+
+.payment-system.dark .service-price {
+    color: #f1f5f9;
 }
 
 .payment-summary {
@@ -810,6 +1082,13 @@ const paymentStyles = `
     padding: 16px;
     border-radius: 8px;
     margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .payment-summary {
+    background: #334155;
+    border-color: #475569;
 }
 
 .summary-row {
@@ -817,13 +1096,21 @@ const paymentStyles = `
     justify-content: space-between;
     align-items: center;
     padding: 8px 0;
+    font-size: 13px;
 }
 
 .summary-row.total {
     border-top: 1px solid #e2e8f0;
-    font-weight: 600;
+    font-weight: 700;
     color: #1e293b;
-    font-size: 16px;
+    font-size: 14px;
+    margin-top: 4px;
+    padding-top: 12px;
+}
+
+.payment-system.dark .summary-row.total {
+    border-top-color: #475569;
+    color: #f1f5f9;
 }
 
 .payment-controls {
@@ -841,15 +1128,24 @@ const paymentStyles = `
 .amount-section label, .method-section label {
     font-weight: 600;
     color: #374151;
-    font-size: 14px;
+    font-size: 13px;
+}
+
+.payment-system.dark .amount-section label,
+.payment-system.dark .method-section label {
+    color: #e2e8f0;
 }
 
 .amount-input {
     padding: 12px;
     border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 16px;
+    border-radius: 8px;
+    font-size: 15px;
     font-weight: 600;
+    text-align: right;
+    transition: all 0.3s ease;
+    background: white;
+    color: #1e293b;
 }
 
 .amount-input:focus {
@@ -858,17 +1154,31 @@ const paymentStyles = `
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.payment-system.dark .amount-input {
+    background: #334155;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+
+.payment-system.dark .amount-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
 .amount-buttons {
     display: flex;
     gap: 8px;
+    margin-top: 8px;
 }
 
 .method-select {
     padding: 12px;
     border: 1px solid #d1d5db;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 14px;
     background: white;
+    color: #1e293b;
+    transition: all 0.3s ease;
 }
 
 .method-select:focus {
@@ -877,15 +1187,27 @@ const paymentStyles = `
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.payment-system.dark .method-select {
+    background: #334155;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+
+.payment-system.dark .method-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
 .btn {
     padding: 12px 20px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
     text-align: center;
+    flex: 1;
 }
 
 .btn:disabled {
@@ -900,20 +1222,37 @@ const paymentStyles = `
 
 .btn.primary:hover:not(:disabled) {
     background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
 }
 
 .btn.secondary {
     background: #f1f5f9;
     color: #475569;
     border: 1px solid #e2e8f0;
+    padding: 10px 16px;
+    font-size: 13px;
 }
 
 .btn.secondary:hover:not(:disabled) {
     background: #e2e8f0;
+    transform: translateY(-1px);
+}
+
+.payment-system.dark .btn.secondary {
+    background: #334155;
+    color: #e2e8f0;
+    border-color: #475569;
+}
+
+.payment-system.dark .btn.secondary:hover:not(:disabled) {
+    background: #475569;
 }
 
 .payment-btn {
     margin-top: 8px;
+    padding: 14px 20px;
+    font-size: 15px;
 }
 
 .vietqr-btn {
@@ -922,15 +1261,25 @@ const paymentStyles = `
 
 .vietqr-btn:hover:not(:disabled) {
     background: linear-gradient(135deg, #059669, #047857) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
 }
 
 .method-info {
     background: #f0f9ff;
     border: 1px solid #bae6fd;
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 12px;
     font-size: 13px;
     color: #0369a1;
+    margin-top: 8px;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .method-info {
+    background: #1e3a5f;
+    border-color: #1e40af;
+    color: #bfdbfe;
 }
 
 /* VietQR Styles */
@@ -939,6 +1288,9 @@ const paymentStyles = `
     display: flex;
     flex-direction: column;
     gap: 20px;
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .vietqr-header {
@@ -947,10 +1299,28 @@ const paymentStyles = `
     border-bottom: 1px solid #e2e8f0;
 }
 
+.payment-system.dark .vietqr-header {
+    border-bottom-color: #334155;
+}
+
 .vietqr-header h3 {
     margin: 0 0 8px 0;
-    font-size: 20px;
+    font-size: 18px;
     color: #1e293b;
+    font-weight: 700;
+}
+
+.payment-system.dark .vietqr-header h3 {
+    color: #f1f5f9;
+}
+
+.vietqr-header p {
+    margin: 0;
+    color: #64748b;
+}
+
+.payment-system.dark .vietqr-header p {
+    color: #94a3b8;
 }
 
 .vietqr-setup {
@@ -964,12 +1334,23 @@ const paymentStyles = `
     padding: 20px;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .bank-info {
+    background: #334155;
+    border-color: #475569;
 }
 
 .bank-info h4 {
     margin: 0 0 16px 0;
-    font-size: 16px;
+    font-size: 15px;
     color: #1e293b;
+    font-weight: 600;
+}
+
+.payment-system.dark .bank-info h4 {
+    color: #f1f5f9;
 }
 
 .bank-details {
@@ -984,6 +1365,12 @@ const paymentStyles = `
     align-items: center;
     padding: 8px 0;
     border-bottom: 1px solid #e2e8f0;
+    font-size: 13px;
+}
+
+.payment-system.dark .bank-details .detail-item {
+    border-bottom-color: #475569;
+    color: #e2e8f0;
 }
 
 .bank-details .detail-item:last-child {
@@ -991,9 +1378,9 @@ const paymentStyles = `
 }
 
 .bank-details .amount {
-    font-weight: 600;
+    font-weight: 700;
     color: #059669;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .bank-details .content {
@@ -1003,6 +1390,16 @@ const paymentStyles = `
     border-radius: 4px;
     font-size: 12px;
     border: 1px solid #e2e8f0;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #1e293b;
+}
+
+.payment-system.dark .bank-details .content {
+    background: #1e293b;
+    border-color: #475569;
+    color: #e2e8f0;
 }
 
 .vietqr-display {
@@ -1019,12 +1416,20 @@ const paymentStyles = `
     border-radius: 12px;
     border: 2px solid #e2e8f0;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .qr-container {
+    background: #1e293b;
+    border-color: #475569;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .qr-code {
-    width: 250px;
-    height: 250px;
+    width: 220px;
+    height: 220px;
     display: block;
+    border-radius: 8px;
 }
 
 .qr-overlay {
@@ -1039,6 +1444,12 @@ const paymentStyles = `
     align-items: center;
     justify-content: center;
     gap: 12px;
+    border-radius: 8px;
+}
+
+.payment-system.dark .qr-overlay {
+    background: rgba(30, 41, 59, 0.95);
+    color: #e2e8f0;
 }
 
 .loading-spinner {
@@ -1048,6 +1459,11 @@ const paymentStyles = `
     border-top: 3px solid #3b82f6;
     border-radius: 50%;
     animation: spin 1s linear infinite;
+}
+
+.payment-system.dark .loading-spinner {
+    border: 3px solid #475569;
+    border-top: 3px solid #3b82f6;
 }
 
 @keyframes spin {
@@ -1060,13 +1476,25 @@ const paymentStyles = `
     padding: 20px;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
+    width: 100%;
     max-width: 400px;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .payment-steps {
+    background: #334155;
+    border-color: #475569;
 }
 
 .payment-steps h4 {
     margin: 0 0 12px 0;
-    font-size: 16px;
+    font-size: 15px;
     color: #1e293b;
+    font-weight: 600;
+}
+
+.payment-system.dark .payment-steps h4 {
+    color: #f1f5f9;
 }
 
 .payment-steps ol {
@@ -1078,12 +1506,18 @@ const paymentStyles = `
 }
 
 .payment-steps li {
-    font-size: 14px;
+    font-size: 13px;
     color: #475569;
+    line-height: 1.4;
+}
+
+.payment-system.dark .payment-steps li {
+    color: #cbd5e1;
 }
 
 .payment-status {
     text-align: center;
+    width: 100%;
 }
 
 .status-waiting {
@@ -1092,6 +1526,15 @@ const paymentStyles = `
     color: #92400e;
     border-radius: 8px;
     font-weight: 500;
+    font-size: 14px;
+    border: 1px solid #fcd34d;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .status-waiting {
+    background: #451a03;
+    color: #fdba74;
+    border-color: #92400e;
 }
 
 .payment-success {
@@ -1100,6 +1543,14 @@ const paymentStyles = `
     background: #f0fdf4;
     border-radius: 12px;
     border: 1px solid #bbf7d0;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .payment-success {
+    background: #052e16;
+    border-color: #166534;
+    color: #bbf7d0;
 }
 
 .success-icon {
@@ -1110,6 +1561,12 @@ const paymentStyles = `
 .payment-success h3 {
     margin: 0 0 12px 0;
     color: #059669;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.payment-system.dark .payment-success h3 {
+    color: #34d399;
 }
 
 .payment-success p {
@@ -1118,14 +1575,27 @@ const paymentStyles = `
     color: #374151;
 }
 
+.payment-system.dark .payment-success p {
+    color: #d1fae5;
+}
+
 /* Invoice Styles */
 .invoice-preview {
     background: white;
     padding: 24px;
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
     margin: 0 auto;
+    height: fit-content;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .invoice-preview {
+    background: #1e293b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    color: #e2e8f0;
 }
 
 .invoice-header {
@@ -1135,27 +1605,55 @@ const paymentStyles = `
     margin-bottom: 20px;
 }
 
+.payment-system.dark .invoice-header {
+    border-bottom-color: #334155;
+}
+
 .invoice-header h2 {
     margin: 0 0 8px 0;
     color: #1e293b;
-    font-size: 24px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.payment-system.dark .invoice-header h2 {
+    color: #f1f5f9;
 }
 
 .invoice-header p {
     margin: 0;
     color: #64748b;
     font-weight: 600;
+    font-size: 13px;
+}
+
+.payment-system.dark .invoice-header p {
+    color: #94a3b8;
 }
 
 .invoice-info {
     margin-bottom: 20px;
+    background: #f8fafc;
+    padding: 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.payment-system.dark .invoice-info {
+    background: #334155;
 }
 
 .info-row {
     display: flex;
     justify-content: space-between;
-    padding: 4px 0;
+    padding: 6px 0;
     border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+}
+
+.payment-system.dark .info-row {
+    border-bottom-color: #475569;
+    color: #e2e8f0;
 }
 
 .info-row:last-child {
@@ -1169,6 +1667,12 @@ const paymentStyles = `
 .invoice-services h4 {
     margin: 0 0 12px 0;
     color: #374151;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.payment-system.dark .invoice-services h4 {
+    color: #e2e8f0;
 }
 
 .service-row {
@@ -1176,6 +1680,12 @@ const paymentStyles = `
     justify-content: space-between;
     padding: 8px 0;
     border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+}
+
+.payment-system.dark .service-row {
+    border-bottom-color: #475569;
+    color: #e2e8f0;
 }
 
 .service-row:last-child {
@@ -1183,9 +1693,13 @@ const paymentStyles = `
 }
 
 .invoice-footer {
-    margin-top: 30px;
+    margin-top: 24px;
     padding-top: 20px;
     border-top: 2px solid #e2e8f0;
+}
+
+.payment-system.dark .invoice-footer {
+    border-top-color: #334155;
 }
 
 .footer-actions {
@@ -1194,7 +1708,57 @@ const paymentStyles = `
     justify-content: center;
 }
 
-/* Responsive */
+/* Print Styles */
+@media print {
+    .payment-header,
+    .patients-panel,
+    .footer-actions .btn.secondary,
+    .theme-toggle {
+        display: none !important;
+    }
+    
+    .payment-layout {
+        display: block;
+        height: auto;
+    }
+    
+    .payment-panel {
+        padding: 0;
+        background: white;
+    }
+    
+    .invoice-preview {
+        box-shadow: none;
+        max-width: none;
+        margin: 0;
+        padding: 20px;
+        background: white !important;
+        color: #000 !important;
+    }
+    
+    .invoice-info {
+        background: #f8f9fa !important;
+    }
+    
+    .payment-summary {
+        background: #f8f9fa !important;
+        border: 1px solid #dee2e6 !important;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .payment-layout {
+        height: auto;
+        min-height: calc(100vh - 73px);
+    }
+    
+    .patients-panel {
+        width: 320px;
+        min-width: 320px;
+    }
+}
+
 @media (max-width: 768px) {
     .payment-layout {
         flex-direction: column;
@@ -1203,7 +1767,26 @@ const paymentStyles = `
     
     .patients-panel {
         width: 100%;
+        min-width: 100%;
         height: 300px;
+        border-right: none;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .payment-system.dark .patients-panel {
+        border-bottom-color: #334155;
+    }
+    
+    .payment-panel {
+        padding: 16px;
+        min-height: 400px;
+    }
+    
+    .payment-form,
+    .vietqr-payment,
+    .invoice-preview {
+        max-width: 100%;
+        padding: 20px;
     }
     
     .vietqr-display {
@@ -1222,6 +1805,232 @@ const paymentStyles = `
     .footer-actions {
         flex-direction: column;
     }
+    
+    .amount-buttons {
+        flex-direction: column;
+    }
+    
+    .bank-details .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .bank-details .content {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .payment-header {
+        padding: 12px 16px;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .header-actions {
+        align-self: flex-end;
+    }
+    
+    .payment-header h1 {
+        font-size: 18px;
+    }
+    
+    .subtitle {
+        font-size: 12px;
+    }
+    
+    .panel-header {
+        padding: 16px;
+    }
+    
+    .patient-card {
+        padding: 12px;
+    }
+    
+    .payment-form,
+    .invoice-preview {
+        padding: 16px;
+    }
+    
+    .qr-code {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .patient-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .status-badge {
+        align-self: flex-start;
+    }
+}
+
+/* Scrollbar Styling */
+.patients-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.patients-list::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.patients-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.patients-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.payment-system.dark .patients-list::-webkit-scrollbar-track {
+    background: #334155;
+}
+
+.payment-system.dark .patients-list::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+.payment-system.dark .patients-list::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+.payment-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.payment-panel::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.payment-panel::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.payment-panel::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.payment-system.dark .payment-panel::-webkit-scrollbar-track {
+    background: #1e293b;
+}
+
+.payment-system.dark .payment-panel::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+.payment-system.dark .payment-panel::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* Animation enhancements */
+.patient-card {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.payment-form,
+.vietqr-payment,
+.invoice-preview {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Loading states */
+.btn:disabled {
+    position: relative;
+}
+
+.btn:disabled::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Focus styles for accessibility */
+.btn:focus,
+.search-input:focus,
+.status-filter:focus,
+.amount-input:focus,
+.method-select:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .payment-system {
+        background: white;
+    }
+    
+    .payment-system.dark {
+        background: #000;
+    }
+    
+    .patient-card {
+        border: 2px solid #000;
+    }
+    
+    .payment-system.dark .patient-card {
+        border: 2px solid #fff;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .patient-card,
+    .payment-form,
+    .vietqr-payment,
+    .invoice-preview,
+    .btn {
+        transition: none;
+        animation: none;
+    }
+    
+    .loading-spinner {
+        animation-duration: 2s;
+    }
+}
+
+/* Smooth theme transition */
+* {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 `;
 

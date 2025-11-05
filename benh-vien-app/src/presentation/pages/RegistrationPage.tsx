@@ -9,6 +9,9 @@ import { Dashboard } from "@presentation/components/DashboardForm"
 import { ServiceCatalogForm} from "@presentation/components/ServiceCatalog";
 import {Payment} from "@presentation/components/Payment";
 import DoctorSchedule from "@presentation/components/DoctorSchedule";
+import DoctorExamination from "@presentation/components/DoctorExamination";
+import MedicalReports from "@presentation/components/MedicaReport";
+
 
 // Hook quản lý theme
 const useTheme = () => {
@@ -60,6 +63,7 @@ function Sidebar({
     {key: 'dashboard', label: 'Tổng quan'},
     {key: 'registration', label: 'Tiếp nhận & CLS'},
     {key: 'payment', label: 'Thanh Toán'},
+    {key: 'DoctorExamination', label: 'Bác Sĩ Khám'},
     {key: 'DoctorSchedule', label: 'Lịch làm việc của Bác Sĩ'},
     {key: 'services', label: 'Danh mục dịch vụ'},
     {key: 'reports', label: 'Báo cáo'},
@@ -69,10 +73,10 @@ function Sidebar({
   return (
       <aside className={`sidebar-fixed ${collapsed ? 'is-collapsed' : ''}`}>
         <div className="sidebar__header">
-          <div className="logo"/>
+
           {!collapsed && (
               <div className="brand">
-                <div className="brand__name">SAIGON-ITO</div>
+                <div className="brand__name">SAIGON-ITO-HOSPITAL</div>
                 <div className="brand__sub"></div>
               </div>
           )}
@@ -228,6 +232,9 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
         return <Payment/>
       case 'DoctorSchedule':
         return <DoctorSchedule/>
+      case 'DoctorExamination':
+        return <DoctorExamination/>
+
 
     }
   }
@@ -246,21 +253,18 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
             <div className="header-content">
               <div className="header-left">
                 <div className="logo-container">
-                  <img
-                      src="/image/otp.png"
-                      alt="SAIGON ITO"
-                      className="header-logo"
+                  {/*<img*/}
+                  {/*  */}
+                  {/*    alt="SAIGON ITO"*/}
+                  {/*    className="header-logo"*/}
 
-                  />
+                  {/*/>*/}
                   {/*<div className="logo-fallback">ITO</div>*/}
                 </div>
                 <div className="hospital-info">
-                  <div className="hospital-name">Hệ Thống Bệnh Viện Sài GON ITO</div>
-                  <div className="hospital-subtitle">Hệ thống tiếp nhận bệnh nhân</div>
+                  <div className="hospital-name">Hệ Thống Bệnh Viện Sài GÒN ITO</div>
                 </div>
               </div>
-
-              {/* Theme toggle nằm bên phải */}
               <div className="header-right">
                 <ThemeToggle />
               </div>
@@ -282,28 +286,29 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
 // Inject styles (no Tailwind required)
 const style = document.createElement('style')
 style.innerHTML = `
+/* Cập nhật lại phần :root cho theme sáng */
 :root { 
   --sidebar-w: 260px; 
   
-  /* Light theme variables */
-  --bg-color: #f7fafc;
-  --text-color: #111827;
+  /* Light theme variables - MÀU XANH NHẠT */
+  --bg-color: #f0f8ff;
+  --text-color: #1e3a8a;
   --card-bg: #ffffff;
-  --border-color: #e5e7eb;
-  --header-bg: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  --header-text: #ffffff;
-  --sidebar-bg: #0f172a;
-  --sidebar-text: #e5e7eb;
-  --sidebar-border: #1f2937;
-  --sidebar-hover: #111827;
-  --sidebar-active: #1f2937;
-  --muted-color: #6b7280;
+  --border-color: #bfdbfe;
+  --header-bg: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  --header-text: #1e3a8a;
+  --sidebar-bg: #1e3a8a;
+  --sidebar-text: #dbeafe;
+  --sidebar-border: #3730a3;
+  --sidebar-hover: #3730a3;
+  --sidebar-active: #3730a3;
+  --muted-color: #4f46e5;
   --error-color: #dc2626;
   --success-color: #065f46;
   --json-bg: #0b1021;
   --json-text: #d1d5db;
   --btn-bg: #ffffff;
-  --btn-border: #d1d5db;
+  --btn-border: #93c5fd;
   --btn-primary-bg: #2563eb;
   --btn-primary-text: #ffffff;
 }
@@ -331,104 +336,124 @@ style.innerHTML = `
   --btn-primary-text: #ffffff;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* Cập nhật header cho theme sáng */
+.blue-header {
+  position: sticky;
+  top: 0;
+  background: var(--header-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 100;
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.15);
 }
 
-body, html {
-  height: 100%;
-  overflow: hidden;
-}
-
-body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  transition: background-color 0.3s ease, color 0.3s ease;
-  font-family: system-ui, -apple-system, sans-serif;
-}
-
-.layout{
-  min-height: 100vh;
+.header-content {
+  padding: 12px 24px;
   display: flex;
-  background: var(--bg-color);
-  color: var(--text-color); 
-  overflow: hidden;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 70px;
 }
-.layout--collapsed{ --sidebar-w: 72px; }
 
-.sidebar-fixed{
-  position: fixed;
-  inset: 0 auto 0 0;
-  width: var(--sidebar-w);
-  background: var(--sidebar-bg);
-  color: var(--sidebar-text);
+.header-left {
   display: flex;
-  flex-direction: column;
-  border-right: 1px solid var(--sidebar-border);
-  z-index: 1000;
+  align-items: center;
+  gap: 16px;
 }
-.sidebar__header{
+
+.logo-container {
   position: relative;
   display: flex;
-  gap: 10px;
   align-items: center;
-  padding: 14px 14px 10px;
-  border-bottom: 1px solid var(--sidebar-border);
-  flex-shrink: 0;
-}
-.logo{ width: 34px; height: 34px; background: #ffffff; border-radius: 12px; flex-shrink: 0; }
-.brand__name{ font-weight: 700; line-height: 1; color: #ffffff; }
-.brand__sub{ font-size: 11px; color: #d1d5db; }
-.toggle{
-  position: absolute;
-  right: 8px;
-  top: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--sidebar-text);
-  border-radius: 8px;
-  padding: 4px 8px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.toggle:hover{ background: rgba(255, 255, 255, 0.2); }
-.sidebar__nav{
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
-  overflow-y: auto;
-}
-.nav__item{
-  width: 100%;
-  text-align: left;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--sidebar-text);
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s ease;
-}
-.nav__item:hover{ background: var(--sidebar-hover); }
-.nav__item.is-active{ 
-  background: var(--sidebar-active); 
-  border-color: var(--sidebar-border);
-  font-weight: 600;
-}
-.sidebar__footer{
-  margin-top: auto;
-  padding: 14px 12px;
-  font-size: 11px;
-  color: var(--muted-color);
-  border-top: 1px solid var(--sidebar-border);
-  flex-shrink: 0;
 }
 
+.header-logo {
+  height: 45px;
+  width: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] .header-logo {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.header-logo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
+}
+
+.hospital-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.hospital-name {
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--header-text);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.hospital-subtitle {
+  font-size: 12px;
+  color: var(--muted-color);
+  margin-top: 2px;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+  color: #2563eb;
+  backdrop-filter: blur(10px);
+}
+
+[data-theme="dark"] .theme-toggle {
+  background: rgba(30, 58, 138, 0.3);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #bfdbfe;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1) rotate(15deg);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+  background: rgba(30, 58, 138, 0.5);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.5);
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+  background: rgba(13, 71, 161, 0.5);
+  box-shadow: 0 4px 16px rgba(33, 150, 243, 0.5);
+}
 .content{
   flex: 1;
   min-width: 0;
@@ -439,7 +464,7 @@ body {
   overflow: hidden;
 }
 
-/* HEADER MÀU XANH DƯƠNG */
+
 .blue-header {
   position: sticky;
   top: 0;
@@ -503,6 +528,7 @@ body {
 
 .hospital-info {
   display: flex;
+  color: blue;
   flex-direction: column;
 }
 
