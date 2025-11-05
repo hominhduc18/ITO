@@ -11,6 +11,7 @@ import {Payment} from "@presentation/components/Payment";
 import DoctorSchedule from "@presentation/components/DoctorSchedule";
 import DoctorExamination from "@presentation/components/DoctorExamination";
 import MedicalReports from "@presentation/components/MedicaReport";
+import AccountSettings from "@presentation/components/AccountSetting";
 
 
 // Hook quản lý theme
@@ -234,6 +235,9 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
         return <DoctorSchedule/>
       case 'DoctorExamination':
         return <DoctorExamination/>
+      case 'settings':
+        return <AccountSettings/>
+
 
 
     }
