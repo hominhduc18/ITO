@@ -13,7 +13,9 @@ import DoctorExamination from "@presentation/components/DoctorExamination";
 import MedicalReports from "@presentation/components/MedicaReport";
 import AccountSettings from "@presentation/components/AccountSetting";
 
-
+import LanguageSwitcher from '@presentation/components/LanguageSwitcher'; // Import component đã tạo
+import { useTranslation } from 'react-i18next';
+import i18n from "i18next";
 // Hook quản lý theme
 const useTheme = () => {
   const [theme, setTheme] = React.useState(() => {
@@ -36,52 +38,43 @@ const useTheme = () => {
 // Component chuyển đổi theme
 function ThemeToggle() {
   const {theme, toggleTheme} = useTheme();
+  const { t } = useTranslation(); // Thêm hook
 
   return (
       <button
           onClick={toggleTheme}
           className="theme-toggle"
-          aria-label={`Chuyển sang chế độ ${theme === 'light' ? 'tối' : 'sáng'}`}
-          title={`Chế độ ${theme === 'light' ? 'tối' : 'sáng'}`}
+          aria-label={t('themeToggle')}
+          title={theme === 'light' ? t('switchToDark') : t('switchToLight')}
       >
         {theme === 'light' ? '🌙' : '☀️'}
       </button>
   );
 }
+function Sidebar({ active, onNavigate, collapsed, onToggle }: any) {
+  const { t } = useTranslation();
 
-function Sidebar({
-                   active,
-                   onNavigate,
-                   collapsed,
-                   onToggle,
-                 }: {
-  active: string
-  onNavigate: (k: string) => void
-  collapsed: boolean
-  onToggle: () => void
-}) {
   const items = [
-    {key: 'dashboard', label: 'Tổng quan'},
-    {key: 'registration', label: 'Tiếp nhận & CLS'},
-    {key: 'payment', label: 'Thanh Toán'},
-    {key: 'DoctorExamination', label: 'Bác Sĩ Khám'},
-    {key: 'DoctorSchedule', label: 'Lịch làm việc của Bác Sĩ'},
-    {key: 'services', label: 'Danh mục dịch vụ'},
-    {key: 'reports', label: 'Báo cáo'},
-    {key: 'settings', label: 'Cấu hình'},
-
+    {key: 'dashboard', label: t('dashboard')},
+    {key: 'registration', label: t('registration')},
+    {key: 'payment', label: t('payment')},
+    {key: 'DoctorExamination', label: t('doctorExamination')},
+    {key: 'DoctorSchedule', label: t('doctorSchedule')},
+    {key: 'services', label: t('services')},
+    {key: 'reports', label: t('reports')},
+    {key: 'settings', label: t('settings')},
   ]
+
   return (
       <aside className={`sidebar-fixed ${collapsed ? 'is-collapsed' : ''}`}>
         <div className="sidebar__header">
-
           {!collapsed && (
               <div className="brand">
-                <div className="brand__name">SAIGON-ITO-HOSPITAL</div>
-                <div className="brand__sub"></div>
+                <div className="brand__name">{t('hospitalName')}</div>
+                <div className="brand__sub">{t('hospitalSubtitle')}</div>
               </div>
           )}
-          <button className="toggle" onClick={onToggle} title={collapsed ? 'Mở rộng' : 'Thu gọn'}>
+          <button className="toggle" onClick={onToggle} title={collapsed ? t('expand') : t('collapse')}>
             {collapsed ? '›' : '‹'}
           </button>
         </div>
@@ -98,12 +91,16 @@ function Sidebar({
               </button>
           ))}
         </nav>
-        <div className="sidebar__footer">{!collapsed ? '@2025 By ITO' : '©'}</div>
+        <div className="sidebar__footer">
+          {!collapsed ? `@2025 ${t('copyright')}` : '©'}
+          {!collapsed && <div className="version">{t('version')}</div>}
+        </div>
       </aside>
   )
 }
 
 export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVisit }) {
+  const { t } = useTranslation(); // Thêm translation hook
   const {submit, loading, error, registrationId} = useRegistrationController(makeUseCase)
   const [patient, setPatient] = React.useState<any>(() => ({
     fullName: '',
@@ -122,7 +119,7 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
   }))
   const [orders, setOrders] = React.useState<any[]>([])
   const [errors, setErrors] = React.useState<any>({})
-  const [activeMenu, setActiveMenu] = React.useState('dashboard') // Mặc định là dashboard
+  const [activeMenu, setActiveMenu] = React.useState('dashboard')
   const [collapsed, setCollapsed] = React.useState(false)
 
   React.useEffect(() => {
@@ -141,14 +138,14 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
 
   function validate() {
     const e: any = {}
-    if (!patient.fullName?.trim()) e.fullName = 'Vui lòng nhập họ tên'
-    if (!patient.dob) e.dob = 'Chọn ngày sinh'
-    if (!patient.gender) e.gender = 'Chọn giới tính'
-    if (!isPhone(patient.phone || '')) e.phone = 'SĐT 8-15 chữ số'
-    if (!appointment.department) e.department = 'Chọn khoa khám'
-    if (!appointment.preferredDate) e.preferredDate = 'Chọn ngày'
-    if (!appointment.preferredTime) e.preferredTime = 'Chọn giờ'
-    if (!orders.length) e.orders = 'Chọn ít nhất 1 dịch vụ cận lâm sàng'
+    if (!patient.fullName?.trim()) e.fullName = t('registration.errors.fullNameRequired')
+    if (!patient.dob) e.dob = t('registration.errors.dobRequired')
+    if (!patient.gender) e.gender = t('registration.errors.genderRequired')
+    if (!isPhone(patient.phone || '')) e.phone = t('registration.errors.phoneInvalid')
+    if (!appointment.department) e.department = t('registration.errors.departmentRequired')
+    if (!appointment.preferredDate) e.preferredDate = t('registration.errors.dateRequired')
+    if (!appointment.preferredTime) e.preferredTime = t('registration.errors.timeRequired')
+    if (!orders.length) e.orders = t('registration.errors.servicesRequired')
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -207,16 +204,22 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
                 <AncillaryOrderPicker chosen={orders} onAdd={onAdd} onRemove={onRemove} onUpdate={onUpdate}
                                       errors={errors}/>
                 <div style={{display: 'flex', gap: 12, marginTop: 12}}>
-                  <button className="btn primary" onClick={onSubmit} disabled={loading}>Gửi đăng ký</button>
-                  <button className="btn" onClick={resetAll}>Xóa hết</button>
+                  <button className="btn primary" onClick={onSubmit} disabled={loading}>
+                    {loading ? t('registration.processing') : t('registration.submitRegistration')}
+                  </button>
+                  <button className="btn" onClick={resetAll}>{t('registration.resetAll')}</button>
                 </div>
                 {error && <div className="error" style={{marginTop: 8}}>{error}</div>}
-                {registrationId && <div className="ok" style={{marginTop: 8}}>Mã tiếp nhận: {registrationId}</div>}
+                {registrationId && (
+                    <div className="ok" style={{marginTop: 8}}>
+                      {t('registration.registrationSuccess')}: {registrationId}
+                    </div>
+                )}
               </div>
 
               {registrationId && (
                   <div className="card">
-                    <h3>Xem lại yêu cầu (payload demo)</h3>
+                    <h3>{t('registration.reviewInfo')}</h3>
                     <pre className="json">{JSON.stringify({
                       patient,
                       appointment,
@@ -237,9 +240,12 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
         return <DoctorExamination/>
       case 'settings':
         return <AccountSettings/>
-
-
-
+      default:
+        return (
+            <div className="card">
+              <h3>{t('selectFeatureFromMenu')}</h3>
+            </div>
+        )
     }
   }
 
@@ -257,19 +263,16 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
             <div className="header-content">
               <div className="header-left">
                 <div className="logo-container">
-                  {/*<img*/}
-                  {/*  */}
-                  {/*    alt="SAIGON ITO"*/}
-                  {/*    className="header-logo"*/}
-
-                  {/*/>*/}
-                  {/*<div className="logo-fallback">ITO</div>*/}
+                  {/* Logo có thể thêm sau */}
                 </div>
                 <div className="hospital-info">
-                  <div className="hospital-name">Hệ Thống Bệnh Viện Sài GÒN ITO</div>
+                  <div className="hospital-name">{t('hospitalName')}</div>
+                  <div className="hospital-subtitle">{t('hospitalSubtitle')}</div>
                 </div>
               </div>
               <div className="header-right">
+                <LanguageSwitcher />
+                <div style={{ width: '25px' }}></div>
                 <ThemeToggle />
               </div>
             </div>
@@ -280,13 +283,12 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
           </main>
 
           <footer className="footer">
-            @2025 By Hệ Thống Bệnh Viện Sài GÒN ITO
+             {t('copyright')}
           </footer>
         </div>
       </div>
   )
 }
-
 // Inject styles (no Tailwind required)
 const style = document.createElement('style')
 style.innerHTML = `
@@ -1128,6 +1130,17 @@ style.innerHTML = `
   .quick-actions {
     grid-template-columns: 1fr;
   }
+}
+
+/* THÊM VÀO CUỐI CSS */
+.blue-header {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%) !important;
+  color: white !important;
+}
+
+[data-theme="light"] .blue-header {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+  color: #1e3a8a !important;
 }
 
 /* Scrollbar styling */

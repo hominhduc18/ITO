@@ -1,0 +1,13 @@
+﻿
+{
+  "dashboard": "Dashboard",
+  "registration": "Registration & Services",
+  "payment": "Payment",
+  "doctorExamination": "Doctor Examination",
+  "doctorSchedule": "Doctor Schedule",
+  "services": "Services Catalog",
+  "reports": "Reports",
+  "settings": "Settings",
+  "copyright": "© 2025 Saigon ITO Hospital",
+  "version": "Version 1.0"
+}

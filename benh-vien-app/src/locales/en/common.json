@@ -1,0 +1,22 @@
+﻿
+{
+  "hospitalName": "Saigon ITO Hospital",
+  "hospitalSubtitle": "Enhancing healthcare quality",
+  "welcome": "Welcome",
+  "save": "Save",
+  "cancel": "Cancel",
+  "submit": "Submit",
+  "delete": "Delete",
+  "edit": "Edit",
+  "loading": "Loading...",
+  "error": "Error",
+  "success": "Success",
+  "confirm": "Confirm",
+  "back": "Back",
+  "next": "Next",
+  "search": "Search",
+  "filter": "Filter",
+  "export": "Export",
+  "print": "Print",
+  "download": "Download"
+}

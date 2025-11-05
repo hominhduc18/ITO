@@ -1,0 +1,15 @@
+﻿
+{
+  "title": "System Overview",
+  "subtitle": "Statistics and overview reports",
+  "totalPatients": "Total Patients",
+  "todayPatients": "Today's Patients",
+  "revenue": "Revenue",
+  "appointments": "Appointments",
+  "monthlyRevenue": "Monthly Revenue",
+  "patientStatistics": "Patient Statistics",
+  "departmentStats": "Department Statistics",
+  "recentActivities": "Recent Activities",
+  "quickActions": "Quick Actions",
+  "viewAll": "View All"
+}
