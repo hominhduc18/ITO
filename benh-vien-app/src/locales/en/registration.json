@@ -1,0 +1,13 @@
+﻿
+{
+  "title": "Patient Registration & Service Booking",
+  "subtitle": "Manage registration information and ancillary services",
+  "patientInfo": "Patient Information",
+  "appointmentInfo": "Appointment Information",
+  "ancillaryServices": "Ancillary Services",
+  "submitRegistration": "Submit Registration",
+  "resetAll": "Reset All",
+  "processing": "Processing...",
+  "registrationSuccess": "Registration successful! Reception ID",
+  "reviewInfo": "Registered Information Review"
+}

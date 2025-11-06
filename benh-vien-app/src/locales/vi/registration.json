@@ -1,0 +1,13 @@
+
+{
+  "title": "Tiếp nhận bệnh nhân & Đăng ký dịch vụ",
+  "subtitle": "Quản lý thông tin tiếp nhận và dịch vụ cận lâm sàng",
+  "patientInfo": "Thông tin bệnh nhân",
+  "appointmentInfo": "Thông tin lịch hẹn",
+  "ancillaryServices": "Dịch vụ cận lâm sàng",
+  "submitRegistration": "Gửi đăng ký",
+  "resetAll": "Xóa hết",
+  "processing": "Đang xử lý...",
+  "registrationSuccess": "Đăng ký thành công! Mã tiếp nhận",
+  "reviewInfo": "Thông tin đã đăng ký"
+}

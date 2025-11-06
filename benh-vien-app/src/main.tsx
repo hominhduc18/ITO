@@ -1,10 +1,19 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
 import './index.css'
-import App from './App.tsx'
-
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+import { RegistrationPage } from '@presentation/pages/RegistrationPage'
+import { makeRegisterVisitUC } from '@app/routes/makeRegisterUseCase'
+import LoginApp from "@presentation/pages/LoginApp";
+import '../src/i18n/config'
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <RegistrationPage makeUseCase={makeRegisterVisitUC} />
+  </React.StrictMode>,
 )
+
+
+// ReactDOM.createRoot(document.getElementById('root')!).render(
+//     <React.StrictMode>
+//         <LoginApp />
+//     </React.StrictMode>,
+// )
