@@ -1,0 +1,269 @@
+﻿/* PatientForm.css */
+.patient-form {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.patient-form .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.patient-form .form-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.patient-form .patient-status {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.patient-form .status-badge {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.patient-form .status-existing {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.patient-form .status-new {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.patient-form .form-description {
+    color: var(--muted-color);
+    font-size: 12px;
+    margin-bottom: 16px;
+}
+
+.patient-form .action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.patient-form .btn {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--btn-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.patient-form .btn:hover {
+    transform: translateY(-1px);
+}
+
+.patient-form .btn-secondary {
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border-color: var(--btn-primary-bg);
+}
+
+.patient-form .btn-primary {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+}
+
+.patient-form .btn-danger {
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+.patient-form .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.patient-form .full-width {
+    grid-column: 1 / -1;
+}
+
+/* Modal Styles */
+.patient-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.patient-modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.patient-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.patient-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--text-color);
+}
+
+.patient-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--muted-color);
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.patient-modal-close:hover {
+    background: var(--bg-color);
+}
+
+.patient-search-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.patient-search-results {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.patient-item, .insurance-item {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.patient-item:hover, .insurance-item:hover {
+    background: var(--bg-color);
+    border-color: var(--btn-primary-bg);
+}
+
+.patient-item.selected {
+    background: #f0f9ff;
+    border-color: #3b82f6;
+}
+
+.patient-info {
+    flex: 1;
+}
+
+.patient-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--text-color);
+}
+
+.patient-details {
+    font-size: 12px;
+    color: var(--muted-color);
+    line-height: 1.4;
+}
+
+.patient-selected-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+/* Loading State */
+.patient-loading {
+    padding: 20px;
+    text-align: center;
+    color: var(--muted-color);
+}
+
+.patient-empty {
+    padding: 20px;
+    text-align: center;
+    color: var(--muted-color);
+}
+
+/* Insurance Modal */
+.insurance-search-results {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.insurance-hint {
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--muted-color);
+    text-align: center;
+}
+
+/* Address Section */
+.address-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+.address-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .patient-form .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .patient-form .action-buttons {
+        flex-direction: column;
+    }
+
+    .patient-form .btn {
+        width: 100%;
+        text-align: center;
+    }
+}

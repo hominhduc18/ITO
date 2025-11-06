@@ -205,21 +205,21 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
                                       errors={errors}/>
                 <div style={{display: 'flex', gap: 12, marginTop: 12}}>
                   <button className="btn primary" onClick={onSubmit} disabled={loading}>
-                    {loading ? t('registration.processing') : t('registration.submitRegistration')}
+                    {loading ? t('processing') : t('submitRegistration')}
                   </button>
-                  <button className="btn" onClick={resetAll}>{t('registration.resetAll')}</button>
+                  <button className="btn" onClick={resetAll}>{t('resetAll')}</button>
                 </div>
                 {error && <div className="error" style={{marginTop: 8}}>{error}</div>}
                 {registrationId && (
                     <div className="ok" style={{marginTop: 8}}>
-                      {t('registration.registrationSuccess')}: {registrationId}
+                      {t('registrationSuccess')}: {registrationId}
                     </div>
                 )}
               </div>
 
               {registrationId && (
                   <div className="card">
-                    <h3>{t('registration.reviewInfo')}</h3>
+                    <h3>{t('reviewInfo')}</h3>
                     <pre className="json">{JSON.stringify({
                       patient,
                       appointment,
