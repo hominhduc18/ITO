@@ -1,7 +1,11 @@
 ﻿// components/Dashboard.jsx
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from "i18next";
 
 export function Dashboard() {
+    const { t } = useTranslation();
+
     const [stats, setStats] = React.useState({
         totalPatients: 0,
         todayAppointments: 0,
@@ -14,7 +18,6 @@ export function Dashboard() {
     const [appointmentData, setAppointmentData] = React.useState([]);
     const [departmentData, setDepartmentData] = React.useState([]);
 
-    // Mock data đơn giản
     React.useEffect(() => {
         setStats({
             totalPatients: 1245,
@@ -25,22 +28,24 @@ export function Dashboard() {
             occupiedBeds: 89
         });
 
+        // Sử dụng translation keys cho ngày trong tuần
         setAppointmentData([
-            { day: 'T2', appointments: 45 },
-            { day: 'T3', appointments: 52 },
-            { day: 'T4', appointments: 38 },
-            { day: 'T5', appointments: 20 },
-            { day: 'T6', appointments: 55 },
-            { day: 'T7', appointments: 48 },
-            { day: 'CN', appointments: 35 }
+            { day: t('monday'), appointments: 45 },
+            { day: t('tuesday'), appointments: 52 },
+            { day: t('wednesday'), appointments: 38 },
+            { day: t('thursday'), appointments: 20 },
+            { day: t('friday'), appointments: 55 },
+            { day: t('saturday'), appointments: 48 },
+            { day: t('sunday'), appointments: 35 }
         ]);
 
+        // Sử dụng translation keys cho khoa
         setDepartmentData([
-            { name: 'Cấp Cứu', patients: 23, color: '#ef4444' },
-            { name: 'Điều Trị', patients: 45, color: '#3b82f6' },
-            { name: 'Chấn Thương Chỉnh Hình', patients: 32, color: '#10b981' },
+            { name: t('emergency'), patients: 23, color: '#ef4444' },
+            { name: t('treatment'), patients: 45, color: '#3b82f6' },
+            { name: t('orthopedics'), patients: 32, color: '#10b981' },
         ]);
-    }, []);
+    }, [t]); // Thêm t vào dependency
 
     const StatCard = ({ title, value, icon, color, subtitle }) => (
         <div className="stat-card">
@@ -85,7 +90,7 @@ export function Dashboard() {
                                                 height: `${barHeight}px`,
                                                 background: `linear-gradient(to top, #3b82f6, #60a5fa)`
                                             }}
-                                            title={`${item.day}: ${item.appointments} lượt hẹn`}
+                                            title={`${item.day}: ${item.appointments} ${t('appointments').toLowerCase()}`}
                                         >
                                             <span className="bar-value">{item.appointments}</span>
                                         </div>
@@ -128,7 +133,7 @@ export function Dashboard() {
                         })}
                         <div className="pie-center">
                             <span className="pie-total">{total}</span>
-                            <span className="pie-label">BN</span>
+                            <span className="pie-label">{t('patients')}</span>
                         </div>
                     </div>
                     <div className="pie-legend">
@@ -152,9 +157,9 @@ export function Dashboard() {
         <div className="dashboard">
             {/* Header đơn giản */}
             <div className="dashboard-header">
-                <h1>Tổng Quan Hệ Thống Bệnh Viện SaiGon-ITO</h1>
+                <h1>{t('hospitalName')} - {t('dashboardTitle')}</h1>
                 <div className="dashboard-date">
-                    {new Date().toLocaleDateString('vi-VN', {
+                    {new Date().toLocaleDateString(i18n.language === 'vi' ? 'vi-VN' : 'en-US', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
@@ -166,46 +171,46 @@ export function Dashboard() {
             {/* Thống kê chính */}
             <div className="stats-grid">
                 <StatCard
-                    title="Tổng Bệnh Nhân"
+                    title={t('totalPatients')}
                     value={stats.totalPatients.toLocaleString()}
                     icon="👥"
                     color="#3b82f6"
-                    subtitle="Tích lũy"
+                    subtitle={t('accumulated')}
                 />
                 <StatCard
-                    title="Cuộc Hẹn Hôm Nay"
+                    title={t('todayAppointments')}
                     value={stats.todayAppointments}
                     icon="🕒"
                     color="#f59e0b"
-                    subtitle={`${stats.waitingPatients} đang chờ`}
+                    subtitle={`${stats.waitingPatients} ${t('patientsWaiting')}`}
                 />
                 <StatCard
-                    title="Bác Sĩ Có Mặt"
+                    title={t('availableDoctors')}
                     value={stats.availableDoctors}
                     icon="👨‍⚕️"
                     color="#10b981"
-                    subtitle="Đang trực"
+                    subtitle={t('onDuty')}
                 />
                 <StatCard
-                    title="Doanh Thu"
+                    title={t('revenue')}
                     value={`${(stats.revenueToday / 1000000).toFixed(1)}M`}
                     icon="💰"
                     color="#8b5cf6"
-                    subtitle="VND hôm nay"
+                    subtitle={`VND ${t('today')}`}
                 />
                 <StatCard
-                    title="Giường Bệnh"
+                    title={t('occupiedBeds')}
                     value={`${stats.occupiedBeds}/120`}
                     icon="🏥"
                     color="#ef4444"
-                    subtitle={`${Math.round((stats.occupiedBeds / 120) * 100)}% sử dụng`}
+                    subtitle={`${Math.round((stats.occupiedBeds / 120) * 100)}% ${t('bedsUsed')}`}
                 />
                 <StatCard
-                    title="Tỷ Lệ Phục Vụ"
+                    title={t('serviceRate')}
                     value="94%"
                     icon="📈"
                     color="#06b6d4"
-                    subtitle="Tháng này"
+                    subtitle={t('thisMonth')}
                 />
             </div>
 
@@ -213,49 +218,49 @@ export function Dashboard() {
             <div className="charts-grid">
                 <SimpleBarChart
                     data={appointmentData}
-                    title="Lượt Hẹn Theo Tuần"
+                    title={t('appointmentsByWeek')}
                 />
                 <SimplePieChart
                     data={departmentData}
-                    title="Phân Bố Bệnh Nhân Theo Khoa"
+                    title={t('patientDistribution')}
                 />
             </div>
 
             {/* Thông tin nhanh */}
             <div className="quick-info">
                 <div className="info-card">
-                    <h3>Hoạt Động Hôm Nay</h3>
+                    <h3>{t('todayActivities')}</h3>
                     <div className="info-list">
                         <div className="info-item">
-                            <span className="info-label">Tiếp nhận mới:</span>
-                            <span className="info-value">18 bệnh nhân</span>
+                            <span className="info-label">{t('newAdmissions')}:</span>
+                            <span className="info-value">18 {t('patients')}</span>
                         </div>
                         <div className="info-item">
-                            <span className="info-label">Xét nghiệm </span>
-                            <span className="info-value">42 mẫu</span>
+                            <span className="info-label">{t('testsProcessed')}:</span>
+                            <span className="info-value">42 {t('samples')}</span>
                         </div>
                         <div className="info-item">
-                            <span className="info-label">Xuất viện:</span>
-                            <span className="info-value">9 bệnh nhân</span>
+                            <span className="info-label">{t('discharged')}:</span>
+                            <span className="info-value">9 {t('patients')}</span>
                         </div>
                         <div className="info-item">
-                            <span className="info-label">Cấp cứu:</span>
-                            <span className="info-value">5 ca</span>
+                            <span className="info-label">{t('emergencyCases')}:</span>
+                            <span className="info-value">5 {t('cases')}</span>
                         </div>
                     </div>
                 </div>
 
                 <div className="info-card">
-                    <h3>Cảnh Báo</h3>
+                    <h3>{t('alerts')}</h3>
                     <div className="alert-list">
                         <div className="alert-item warning">
-                            <span>⚠️ 2 bệnh nhân chờ cấp cứu</span>
+                            <span>⚠️ 2 {t('patientsWaiting')}</span>
                         </div>
                         <div className="alert-item info">
-                            <span>ℹ️ Máy X-quang cần bảo trì</span>
+                            <span>ℹ️ {t('maintenanceRequired')}</span>
                         </div>
                         <div className="alert-item success">
-                            <span>✅ Tất cả khoa đang hoạt động</span>
+                            <span>✅ {t('allDepartments')}</span>
                         </div>
                     </div>
                 </div>
@@ -701,3 +706,4 @@ if (!document.head.querySelector('#dashboard-styles')) {
     style.innerHTML = dashboardStyles;
     document.head.appendChild(style);
 }
+

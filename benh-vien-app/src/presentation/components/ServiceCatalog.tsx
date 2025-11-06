@@ -64,7 +64,7 @@ export function ServiceCatalogForm() {
     const [showDetail, setShowDetail] = useState(false);
     const [selectedService, setSelectedService] = useState<Service | null>(null);
 
-    // Fetch data từ API - CHỈ GET
+
     useEffect(() => {
         fetchServicesFromAPI();
     }, []);
