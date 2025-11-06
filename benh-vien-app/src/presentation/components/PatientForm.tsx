@@ -1,12 +1,14 @@
-import React from 'react'
-import { TextInput, TextArea, Select } from './Field'
+import React from 'react';
+import { TextInput, TextArea, Select } from './Field';
+import './PatientForm.css';
 
 // Interface cho bệnh nhân từ API
 interface Patient {
     benhNhan_Id: number;
+    maYTe: number;
     tenBenhNhan: string;
-    soDienThoai: string;
-    cmnd: string;
+    soDienThoai: string | null;
+    cmnd: string | null;
     ngaySinh?: string;
     gioiTinh?: string;
     diaChi?: string;
@@ -23,12 +25,20 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
     const [showPatientSearch, setShowPatientSearch] = React.useState(false);
     const [showInsuranceSearch, setShowInsuranceSearch] = React.useState(false);
     const [searchTerm, setSearchTerm] = React.useState('');
+    const [searchType, setSearchType] = React.useState<'maYTe' | 'tenBenhNhan' | 'soDienThoai' | 'cmnd'>('maYTe');
     const [insuranceSearch, setInsuranceSearch] = React.useState('');
     const [isNewPatient, setIsNewPatient] = React.useState(true);
     const [searchResults, setSearchResults] = React.useState<Patient[]>([]);
     const [isSearching, setIsSearching] = React.useState(false);
 
-    // Mock data cho bảo hiểm (giữ nguyên)
+    // State cho danh mục
+    const [countries, setCountries] = React.useState<any[]>([]);
+    const [provinces, setProvinces] = React.useState<any[]>([]);
+    const [districts, setDistricts] = React.useState<any[]>([]);
+    const [wards, setWards] = React.useState<any[]>([]);
+    const [ethnicities, setEthnicities] = React.useState<any[]>([]);
+
+    // Mock data cho bảo hiểm
     const MOCK_INSURANCES = [
         'Bảo hiểm Bảo Việt',
         'Bảo hiểm BIDV',
@@ -40,20 +50,109 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
         'Bảo hiểm MIC'
     ];
 
+    // Load danh mục
+    React.useEffect(() => {
+        loadMasterData();
+    }, []);
+
+    const loadMasterData = async () => {
+        try {
+            // Load quốc tịch
+            const countriesRes = await fetch('/api/DanhMuc/quoc-tich');
+            if (countriesRes.ok) {
+                const countriesData = await countriesRes.json();
+                setCountries(countriesData.data || []);
+            }
+
+            // Load tỉnh/thành phố
+            const provincesRes = await fetch('/api/DanhMuc/tinh-thanh');
+            if (provincesRes.ok) {
+                const provincesData = await provincesRes.json();
+                setProvinces(provincesData.data || []);
+            }
+
+            // Load dân tộc
+            const ethnicitiesRes = await fetch('/api/DanhMuc/dan-toc');
+            if (ethnicitiesRes.ok) {
+                const ethnicitiesData = await ethnicitiesRes.json();
+                setEthnicities(ethnicitiesData.data || []);
+            }
+        } catch (error) {
+            console.error('Error loading master data:', error);
+        }
+    };
+
+    // Load quận/huyện khi tỉnh/thành phố thay đổi
+    React.useEffect(() => {
+        if (value.province) {
+            loadDistricts(value.province);
+        }
+    }, [value.province]);
+
+    // Load xã/phường khi quận/huyện thay đổi
+    React.useEffect(() => {
+        if (value.district) {
+            loadWards(value.district);
+        }
+    }, [value.district]);
+
+    const loadDistricts = async (provinceCode: string) => {
+        try {
+            const res = await fetch(`/api/DanhMuc/quan-huyen?tinhThanh=${provinceCode}`);
+            if (res.ok) {
+                const data = await res.json();
+                setDistricts(data.data || []);
+            }
+        } catch (error) {
+            console.error('Error loading districts:', error);
+        }
+    };
+
+    const loadWards = async (districtCode: string) => {
+        try {
+            const res = await fetch(`/api/DanhMuc/xa-phuong?quanHuyen=${districtCode}`);
+            if (res.ok) {
+                const data = await res.json();
+                setWards(data.data || []);
+            }
+        } catch (error) {
+            console.error('Error loading wards:', error);
+        }
+    };
+
     // Hàm tìm kiếm bệnh nhân từ API
-    const searchPatients = async (searchTerm: string) => {
-        if (!searchTerm.trim()) {
+    const searchPatients = async (searchValue: string, searchType: string) => {
+        if (!searchValue.trim()) {
             setSearchResults([]);
             return;
         }
 
         setIsSearching(true);
         try {
-            const response = await fetch(`/api/BenhNhan/search?tenBenhNhan=${encodeURIComponent(searchTerm)}&soDienThoai=${encodeURIComponent(searchTerm)}&cmnd=${encodeURIComponent(searchTerm)}`);
+            let apiUrl = '';
+
+            switch (searchType) {
+                case 'maYTe':
+                    apiUrl = `/api/BenhNhan/GetBenhNhanByMaYTe/${searchValue}`;
+                    break;
+                case 'tenBenhNhan':
+                    apiUrl = `/api/BenhNhan/search?tenBenhNhan=${encodeURIComponent(searchValue)}`;
+                    break;
+                case 'soDienThoai':
+                    apiUrl = `/api/BenhNhan/search?soDienThoai=${encodeURIComponent(searchValue)}`;
+                    break;
+                case 'cmnd':
+                    apiUrl = `/api/BenhNhan/search?cmnd=${encodeURIComponent(searchValue)}`;
+                    break;
+                default:
+                    apiUrl = `/api/BenhNhan/search?keyword=${encodeURIComponent(searchValue)}`;
+            }
+
+            const response = await fetch(apiUrl);
             const result = await response.json();
 
-            if (result.success) {
-                setSearchResults(result.data);
+            if (result.success && result.data) {
+                setSearchResults(Array.isArray(result.data) ? result.data : [result.data]);
             } else {
                 setSearchResults([]);
                 console.error('Search failed:', result.message);
@@ -70,12 +169,12 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
     React.useEffect(() => {
         const timeoutId = setTimeout(() => {
             if (showPatientSearch && searchTerm) {
-                searchPatients(searchTerm);
+                searchPatients(searchTerm, searchType);
             }
         }, 500);
 
         return () => clearTimeout(timeoutId);
-    }, [searchTerm, showPatientSearch]);
+    }, [searchTerm, searchType, showPatientSearch]);
 
     // Filter insurances based on search
     const filteredInsurances = MOCK_INSURANCES.filter(insurance =>
@@ -83,15 +182,28 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
     );
 
     const handleSelectPatient = (patient: Patient) => {
+        // Map giới tính từ API (G = Nữ, M = Nam, other = Khác)
+        const mapGender = (gioiTinh?: string) => {
+            if (gioiTinh === 'M') return 'male';
+            if (gioiTinh === 'G') return 'female';
+            return 'other';
+        };
+
         onChange({
             fullName: patient.tenBenhNhan,
-            nationalId: patient.cmnd,
-            insurance: '', // Có thể thêm từ API nếu có
-            phone: patient.soDienThoai,
+            nationalId: patient.cmnd || '',
+            medicalCode: patient.maYTe.toString(),
+            insurance: '',
+            phone: patient.soDienThoai || '',
             dob: patient.ngaySinh ? patient.ngaySinh.split('T')[0] : '',
-            gender: patient.gioiTinh === 'male' ? 'male' :
-                patient.gioiTinh === 'female' ? 'female' : 'other',
-            address: patient.diaChi,
+            gender: mapGender(patient.gioiTinh),
+            address: patient.diaChi || '',
+            country: '',
+            ethnicity: '',
+            province: '',
+            district: '',
+            ward: '',
+            street: '',
             patientId: patient.benhNhan_Id,
             isNewPatient: false
         });
@@ -111,11 +223,18 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
         onChange({
             fullName: '',
             nationalId: '',
+            medicalCode: '',
             insurance: '',
             phone: '',
             dob: '',
             gender: '',
             address: '',
+            country: '',
+            ethnicity: '',
+            province: '',
+            district: '',
+            ward: '',
+            street: '',
             patientId: null,
             isNewPatient: true
         });
@@ -146,51 +265,75 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
         }
     };
 
+    // Format giới tính
+    const formatGender = (gioiTinh?: string) => {
+        if (gioiTinh === 'M') return 'Nam';
+        if (gioiTinh === 'G') return 'Nữ';
+        return 'Khác';
+    };
+
+    // Get placeholder based on search type
+    const getSearchPlaceholder = () => {
+        switch (searchType) {
+            case 'maYTe':
+                return 'Nhập mã y tế (VD: 14002832)...';
+            case 'tenBenhNhan':
+                return 'Nhập họ tên bệnh nhân...';
+            case 'soDienThoai':
+                return 'Nhập số điện thoại...';
+            case 'cmnd':
+                return 'Nhập số CCCD/Hộ chiếu...';
+            default:
+                return 'Nhập từ khóa tìm kiếm...';
+        }
+    };
+
+    // Get search description
+    const getSearchDescription = () => {
+        switch (searchType) {
+            case 'maYTe':
+                return 'Tìm kiếm bệnh nhân theo mã y tế';
+            case 'tenBenhNhan':
+                return 'Tìm kiếm bệnh nhân theo họ tên';
+            case 'soDienThoai':
+                return 'Tìm kiếm bệnh nhân theo số điện thoại';
+            case 'cmnd':
+                return 'Tìm kiếm bệnh nhân theo số CCCD/Hộ chiếu';
+            default:
+                return 'Tìm kiếm bệnh nhân';
+        }
+    };
+
     return (
-        <div className="card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <div className="patient-form">
+            <div className="form-header">
                 <h2>1) Thông tin người bệnh</h2>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div className="patient-status">
                     {value.patientId && (
-                        <span style={{
-                            fontSize: '12px',
-                            padding: '4px 8px',
-                            background: '#d1fae5',
-                            color: '#065f46',
-                            borderRadius: '12px',
-                            fontWeight: '500'
-                        }}>
+                        <span className="status-badge status-existing">
                             ✅ Bệnh nhân cũ
                         </span>
                     )}
                     {isNewPatient && !value.patientId && (
-                        <span style={{
-                            fontSize: '12px',
-                            padding: '4px 8px',
-                            background: '#fef3c7',
-                            color: '#92400e',
-                            borderRadius: '12px',
-                            fontWeight: '500'
-                        }}>
+                        <span className="status-badge status-new">
                             🆕 Bệnh nhân mới
                         </span>
                     )}
                 </div>
             </div>
 
-            <p style={{color:'#6b7280', fontSize:12}}>
+            <p className="form-description">
                 {isNewPatient ?
                     "Bệnh nhân mới - Vui lòng nhập đầy đủ thông tin (* bắt buộc)" :
                     "Thông tin bệnh nhân cũ - Có thể cập nhật nếu có thay đổi"
                 }
             </p>
 
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+            <div className="action-buttons">
                 <button
                     type="button"
-                    className="btn secondary"
+                    className="btn btn-secondary"
                     onClick={() => setShowPatientSearch(true)}
-                    style={{ fontSize: '12px', padding: '8px 12px' }}
                 >
                     🔍 Tìm bệnh nhân cũ
                 </button>
@@ -199,38 +342,34 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
                     type="button"
                     className="btn"
                     onClick={handleNewPatient}
-                    style={{
-                        fontSize: '12px',
-                        padding: '8px 12px',
-                        borderColor: '#3b82f6',
-                        color: '#3b82f6'
-                    }}
                 >
                     🆕 Tạo bệnh nhân mới
                 </button>
 
                 <button
                     type="button"
-                    className="btn"
+                    className="btn btn-danger"
                     onClick={clearPatientData}
-                    style={{
-                        fontSize: '12px',
-                        padding: '8px 12px',
-                        borderColor: '#fecaca',
-                        color: '#dc2626'
-                    }}
                 >
                     🗑️ Xóa form
                 </button>
             </div>
 
-            <div className="row cols-2" style={{marginTop:12}}>
+            <div className="form-grid">
+                {/* Mã y tế */}
+                <TextInput
+                    label="Mã Y Tế"
+                    value={value.medicalCode}
+                    onChange={(e: any) => handleInputChange('medicalCode', e.target.value)}
+                    placeholder="Nhập mã y tế để tìm kiếm"
+                />
+
                 {/* Họ và tên */}
                 <TextInput
                     label="Họ và tên"
                     required
                     value={value.fullName}
-                    onChange={(e:any) => handleInputChange('fullName', e.target.value)}
+                    onChange={(e: any) => handleInputChange('fullName', e.target.value)}
                     placeholder="VD: Nguyễn Văn A"
                     hint={errors?.fullName}
                 />
@@ -240,7 +379,7 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
                     label="Ngày sinh"
                     required
                     value={value.dob}
-                    onChange={(e:any) => handleInputChange('dob', e.target.value)}
+                    onChange={(e: any) => handleInputChange('dob', e.target.value)}
                     hint={errors?.dob}
                 />
 
@@ -248,21 +387,49 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
                     label="Giới tính"
                     required
                     value={value.gender}
-                    onChange={(e:any) => handleInputChange('gender', e.target.value)}
+                    onChange={(e: any) => handleInputChange('gender', e.target.value)}
                     options={[
-                        {value:'',label:'Chọn giới tính'},
-                        {value:'male',label:'Nam'},
-                        {value:'female',label:'Nữ'},
-                        {value:'other',label:'Khác'}
+                        { value: '', label: 'Chọn giới tính' },
+                        { value: 'male', label: 'Nam' },
+                        { value: 'female', label: 'Nữ' },
+                        { value: 'other', label: 'Khác' }
                     ]}
                     hint={errors?.gender}
+                />
+
+                {/* Quốc tịch */}
+                <Select
+                    label="Quốc tịch"
+                    value={value.country}
+                    onChange={(e: any) => handleInputChange('country', e.target.value)}
+                    options={[
+                        { value: '', label: 'Chọn quốc tịch' },
+                        ...countries.map((country: any) => ({
+                            value: country.maQuocGia,
+                            label: country.tenQuocGia
+                        }))
+                    ]}
+                />
+
+                {/* Dân tộc */}
+                <Select
+                    label="Dân tộc"
+                    value={value.ethnicity}
+                    onChange={(e: any) => handleInputChange('ethnicity', e.target.value)}
+                    options={[
+                        { value: '', label: 'Chọn dân tộc' },
+                        ...ethnicities.map((ethnicity: any) => ({
+                            value: ethnicity.maDanToc,
+                            label: ethnicity.tenDanToc
+                        }))
+                    ]}
                 />
 
                 {/* Số CCCD */}
                 <TextInput
                     label="Số CCCD/Hộ chiếu"
                     value={value.nationalId}
-                    onChange={(e:any) => handleInputChange('nationalId', e.target.value)}
+                    onChange={(e: any) => handleInputChange('nationalId', e.target.value)}
                     placeholder="12 số"
                 />
 
@@ -270,7 +437,7 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
                     label="Số điện thoại"
                     required
                     value={value.phone}
-                    onChange={(e:any) => handleInputChange('phone', e.target.value)}
+                    onChange={(e: any) => handleInputChange('phone', e.target.value)}
                     placeholder="0912345678"
                     hint={errors?.phone}
                 />
@@ -280,31 +447,86 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
                     <TextInput
                         label="Bảo hiểm tư nhân"
                         value={value.insurance}
-                        onChange={(e:any) => handleInputChange('insurance', e.target.value)}
+                        onChange={(e: any) => handleInputChange('insurance', e.target.value)}
                         placeholder="Chọn hoặc nhập bảo hiểm"
                         onFocus={() => setShowInsuranceSearch(true)}
                     />
                 </div>
             </div>
 
-            <div style={{marginTop:12}}>
+            {/* Address Section */}
+            <div className="address-section">
+                <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', color: 'var(--text-color)' }}>
+                    Thông tin địa chỉ
+                </h3>
+
+                <div className="address-grid">
+                    <Select
+                        label="Tỉnh/Thành Phố"
+                        value={value.province}
+                        onChange={(e: any) => handleInputChange('province', e.target.value)}
+                        options={[
+                            { value: '', label: 'Chọn tỉnh/thành phố' },
+                            ...provinces.map((province: any) => ({
+                                value: province.maTinh,
+                                label: province.tenTinh
+                            }))
+                        ]}
+                    />
+
+                    <Select
+                        label="Quận/Huyện"
+                        value={value.district}
+                        onChange={(e: any) => handleInputChange('district', e.target.value)}
+                        options={[
+                            { value: '', label: 'Chọn quận/huyện' },
+                            ...districts.map((district: any) => ({
+                                value: district.maQuan,
+                                label: district.tenQuan
+                            }))
+                        ]}
+                        disabled={!value.province}
+                    />
+
+                    <Select
+                        label="Xã/Phường"
+                        value={value.ward}
+                        onChange={(e: any) => handleInputChange('ward', e.target.value)}
+                        options={[
+                            { value: '', label: 'Chọn xã/phường' },
+                            ...wards.map((ward: any) => ({
+                                value: ward.maXa,
+                                label: ward.tenXa
+                            }))
+                        ]}
+                        disabled={!value.district}
+                    />
+
+                    <TextInput
+                        label="Số nhà/Tên đường"
+                        value={value.street}
+                        onChange={(e: any) => handleInputChange('street', e.target.value)}
+                        placeholder="Số nhà, tên đường"
+                    />
+                </div>
+
                 <TextArea
-                    label="Địa chỉ"
+                    label="Địa chỉ đầy đủ"
                     rows={2}
                     value={value.address}
-                    onChange={(e:any) => handleInputChange('address', e.target.value)}
-                    placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
+                    onChange={(e: any) => handleInputChange('address', e.target.value)}
+                    placeholder="Địa chỉ đầy đủ sẽ tự động điền từ các thông tin trên"
                 />
             </div>
 
             {/* Patient Search Modal */}
             {showPatientSearch && (
-                <div className="modal-overlay" onClick={() => setShowPatientSearch(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
+                <div className="patient-modal-overlay" onClick={() => setShowPatientSearch(false)}>
+                    <div className="patient-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="patient-modal-header">
                             <h3>🔍 Tìm bệnh nhân</h3>
                             <button
-                                className="close-btn"
+                                className="patient-modal-close"
                                 onClick={() => setShowPatientSearch(false)}
                             >
                                 ×
@@ -313,71 +535,93 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
 
                         <div style={{ marginBottom: '16px' }}>
                             <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>
-                                Tìm bệnh nhân đã có trong hệ thống theo tên, CCCD hoặc số điện thoại
+                                {getSearchDescription()}
                             </p>
-                            <div className="search-box">
-                                <input
-                                    type="text"
-                                    placeholder="Tìm theo tên, số CCCD, số điện thoại..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="search-input"
-                                    autoFocus
-                                />
+
+                            {/* Search Type Selector */}
+                            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                                <button
+                                    type="button"
+                                    className={`btn ${searchType === 'maYTe' ? 'btn-secondary' : ''}`}
+                                    onClick={() => setSearchType('maYTe')}
+                                    style={{ fontSize: '12px', padding: '6px 12px' }}
+                                >
+                                    Mã Y Tế
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`btn ${searchType === 'tenBenhNhan' ? 'btn-secondary' : ''}`}
+                                    onClick={() => setSearchType('tenBenhNhan')}
+                                    style={{ fontSize: '12px', padding: '6px 12px' }}
+                                >
+                                    Họ Tên
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`btn ${searchType === 'soDienThoai' ? 'btn-secondary' : ''}`}
+                                    onClick={() => setSearchType('soDienThoai')}
+                                    style={{ fontSize: '12px', padding: '6px 12px' }}
+                                >
+                                    Số Điện Thoại
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`btn ${searchType === 'cmnd' ? 'btn-secondary' : ''}`}
+                                    onClick={() => setSearchType('cmnd')}
+                                    style={{ fontSize: '12px', padding: '6px 12px' }}
+                                >
+                                    CCCD
+                                </button>
                             </div>
+
+                            <input
+                                type="text"
+                                placeholder={getSearchPlaceholder()}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="patient-search-input"
+                                autoFocus
+                            />
                         </div>
 
-                        <div className="search-results" style={{ maxHeight: '300px', overflowY: 'auto', marginBottom: '16px' }}>
+                        <div className="patient-search-results">
                             {isSearching ? (
-                                <div style={{ padding: '20px', textAlign: 'center', color: '#6b7280' }}>
-                                    🔍 Đang tìm kiếm...
+                                <div className="patient-loading">
+                                    🔍 Đang tìm kiếm bệnh nhân...
                                 </div>
                             ) : searchResults.length === 0 ? (
-                                <div style={{ padding: '20px', textAlign: 'center', color: '#6b7280' }}>
-                                    {searchTerm ? 'Không tìm thấy bệnh nhân phù hợp' : 'Nhập từ khóa để tìm kiếm'}
+                                <div className="patient-empty">
+                                    {searchTerm ? `Không tìm thấy bệnh nhân với ${getSearchDescription().toLowerCase()}` : `Nhập thông tin để tìm kiếm theo ${getSearchDescription().toLowerCase()}`}
                                 </div>
                             ) : (
                                 searchResults.map(patient => (
                                     <div
                                         key={patient.benhNhan_Id}
-                                        className="patient-item"
+                                        className={`patient-item ${value.patientId === patient.benhNhan_Id ? 'selected' : ''}`}
                                         onClick={() => handleSelectPatient(patient)}
-                                        style={{
-                                            padding: '12px',
-                                            border: '1px solid #e5e7eb',
-                                            borderRadius: '8px',
-                                            marginBottom: '8px',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s ease',
-                                            background: value.patientId === patient.benhNhan_Id ? '#f0f9ff' : 'white'
-                                        }}
                                     >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{ fontWeight: '600', marginBottom: '4px' }}>
+                                            <div className="patient-info">
+                                                <div className="patient-name">
                                                     {patient.tenBenhNhan}
                                                 </div>
-                                                <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                                                    CCCD: {patient.cmnd || 'Chưa có'} • ĐT: {patient.soDienThoai || 'Chưa có'}
+                                                <div className="patient-details">
+                                                    <strong>Mã Y tế:</strong> {patient.maYTe} •
+                                                    <strong> Giới tính:</strong> {formatGender(patient.gioiTinh)}
                                                 </div>
-                                                <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                                                    {patient.ngaySinh && `Ngày sinh: ${formatDate(patient.ngaySinh)}`}
-                                                    {patient.gioiTinh && ` • Giới tính: ${patient.gioiTinh === 'male' ? 'Nam' : patient.gioiTinh === 'female' ? 'Nữ' : 'Khác'}`}
+                                                <div className="patient-details">
+                                                    {patient.cmnd && <><strong>CCCD:</strong> {patient.cmnd} • </>}
+                                                    {patient.soDienThoai && <><strong>ĐT:</strong> {patient.soDienThoai} • </>}
+                                                    {patient.ngaySinh && <><strong>Ngày sinh:</strong> {formatDate(patient.ngaySinh)}</>}
                                                 </div>
                                                 {patient.diaChi && (
-                                                    <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-                                                        Địa chỉ: {patient.diaChi}
+                                                    <div className="patient-details">
+                                                        <strong>Địa chỉ:</strong> {patient.diaChi}
                                                     </div>
                                                 )}
                                             </div>
                                             {value.patientId === patient.benhNhan_Id && (
-                                                <span style={{
-                                                    fontSize: '10px',
-                                                    padding: '2px 6px',
-                                                    background: '#3b82f6',
-                                                    color: 'white',
-                                                    borderRadius: '8px'
-                                                }}>
+                                                <span className="patient-selected-badge">
                                                     Đang chọn
                                                 </span>
                                             )}
@@ -389,7 +633,7 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
 
                         <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '16px' }}>
                             <button
-                                className="btn primary"
+                                className="btn btn-primary"
                                 onClick={handleNewPatient}
                                 style={{ width: '100%', padding: '12px' }}
                             >
@@ -398,151 +642,58 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
                         </div>
 
                         <div style={{ marginTop: '12px', fontSize: '12px', color: '#6b7280', textAlign: 'center' }}>
-                            Tìm thấy {searchResults.length} bệnh nhân • Chọn hoặc tạo mới
+                            {searchResults.length > 0
+                                ? `Tìm thấy ${searchResults.length} bệnh nhân • Chọn hoặc tạo mới`
+                                : `Nhập thông tin để tìm kiếm theo ${getSearchDescription().toLowerCase()}`
+                            }
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Insurance Search Modal (giữ nguyên) */}
+            {/* Insurance Search Modal */}
             {showInsuranceSearch && (
-                <div className="modal-overlay" onClick={() => setShowInsuranceSearch(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
+                <div className="patient-modal-overlay" onClick={() => setShowInsuranceSearch(false)}>
+                    <div className="patient-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="patient-modal-header">
                             <h3>🏥 Chọn bảo hiểm</h3>
                             <button
-                                className="close-btn"
+                                className="patient-modal-close"
                                 onClick={() => setShowInsuranceSearch(false)}
                             >
                                 ×
                             </button>
                         </div>
 
-                        <div className="search-box" style={{ marginBottom: '16px' }}>
-                            <input
-                                type="text"
-                                placeholder="Tìm bảo hiểm..."
-                                value={insuranceSearch}
-                                onChange={(e) => setInsuranceSearch(e.target.value)}
-                                className="search-input"
-                                autoFocus
-                            />
-                        </div>
+                        <input
+                            type="text"
+                            placeholder="Tìm bảo hiểm..."
+                            value={insuranceSearch}
+                            onChange={(e) => setInsuranceSearch(e.target.value)}
+                            className="patient-search-input"
+                            autoFocus
+                        />
 
-                        <div className="search-results" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                        <div className="insurance-search-results">
                             {filteredInsurances.map((insurance, index) => (
                                 <div
                                     key={index}
                                     className="insurance-item"
                                     onClick={() => handleSelectInsurance(insurance)}
-                                    style={{
-                                        padding: '12px',
-                                        border: '1px solid #e5e7eb',
-                                        borderRadius: '8px',
-                                        marginBottom: '8px',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s ease'
-                                    }}
                                 >
                                     {insurance}
                                 </div>
                             ))}
                         </div>
 
-                        <div style={{ marginTop: '16px', fontSize: '12px', color: '#6b7280', textAlign: 'center' }}>
+                        <div className="insurance-hint">
                             Hoặc nhập trực tiếp vào ô bảo hiểm
                         </div>
                     </div>
                 </div>
             )}
-
-            <style>{`
-                .modal-overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(0, 0, 0, 0.5);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 1000;
-                }
-
-                .modal-content {
-                    background: white;
-                    padding: 20px;
-                    border-radius: 12px;
-                    width: 90%;
-                    max-width: 500px;
-                    max-height: 80vh;
-                    overflow: hidden;
-                    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-                }
-
-                .modal-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 16px;
-                }
-
-                .modal-header h3 {
-                    margin: 0;
-                    font-size: 18px;
-                }
-
-                .close-btn {
-                    background: none;
-                    border: none;
-                    font-size: 24px;
-                    cursor: pointer;
-                    color: #6b7280;
-                    padding: 4px;
-                }
-
-                .search-input {
-                    width: 100%;
-                    padding: 10px 12px;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 8px;
-                    font-size: 14px;
-                }
-
-                .patient-item:hover, .insurance-item:hover {
-                    background: #f3f4f6;
-                    border-color: #3b82f6;
-                }
-
-                .btn {
-                    padding: 8px 16px;
-                    border: 1px solid #d1d5db;
-                    border-radius: 8px; 
-                    background: white;
-                    cursor: pointer;
-                    font-size: 14px;
-                    transition: all 0.2s ease;
-                }
-
-                .btn.secondary {
-                    background: #3b82f6;
-                    color: white;
-                    border-color: #3b82f6;
-                }
-
-                .btn.primary {
-                    background: #10b981;
-                    color: white;
-                    border-color: #10b981;
-                }
-
-                .btn:hover {
-                    transform: translateY(-1px);
-                }
-            `}</style>
         </div>
     )
 }
 
-export default PatientForm
+export default PatientForm;
