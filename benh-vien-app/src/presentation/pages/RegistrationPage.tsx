@@ -1,8 +1,8 @@
 import React from 'react'
-import { PatientForm } from '@presentation/components/PatientForm'
+import { PatientForm } from '@presentation/components/PatientForm/PatientForm'
 import { AppointmentForm } from '@presentation/components/AppointmentForm'
 import { AncillaryOrderPicker } from '@presentation/components/AncillaryOrderPicker'
-import { useRegistrationController } from '@presentation/controllers/useRegistrationController'
+import { useRegistrationController } from '@presentation/services/useRegistrationController'
 import type { RegisterVisit } from '@application/usecases/RegisterVisit'
 import { isPhone } from '@shared/utils/validation'
 import { Dashboard } from "@presentation/components/DashboardForm"
