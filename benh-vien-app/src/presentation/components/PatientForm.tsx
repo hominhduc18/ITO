@@ -1,6 +1,7 @@
 import React from 'react';
 import { TextInput, TextArea, Select } from './Field';
 import './PatientForm.css';
+import './PatientModal.css';
 
 // Interface cho bệnh nhân từ API
 interface Patient {
@@ -126,6 +127,7 @@ export function PatientForm({ value, onChange, errors }: PatientFormProps) {
             setSearchResults([]);
             return;
         }
+
 
         setIsSearching(true);
         try {

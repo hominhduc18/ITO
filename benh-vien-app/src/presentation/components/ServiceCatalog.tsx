@@ -268,7 +268,7 @@ export function ServiceCatalogForm() {// States
             // Update stats
             updateStats(convertedServices);
 
-            addNotification('success', `Đã tải ${convertedServices.length} dịch vụ`);
+            // addNotification('success', `Đã tải ${convertedServices.length} dịch vụ`);
 
         } catch (err) {
             console.error('❌ Error fetching services:', err);

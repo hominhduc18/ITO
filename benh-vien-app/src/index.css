@@ -27,9 +27,9 @@ pre.json { background:#0b1021; color:#d1d5db; border-radius: 12px; padding: 12px
 
   /* Light theme variables */
   --bg-color: #f7fafc;
-  --text-color: #111827;
+  --text-color: #05c7f6;
   --card-bg: #ffffff;
-  --border-color: #e5e7eb;
+  --border-color: #05c7f6;
   --header-bg: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   --header-text: #ffffff;
   --sidebar-bg: #0f172a;
@@ -50,7 +50,7 @@ pre.json { background:#0b1021; color:#d1d5db; border-radius: 12px; padding: 12px
 
 [data-theme="dark"] {
   --bg-color: #0f172a;
-  --text-color: #f1f5f9;
+  --text-color: #0579ed;
   --card-bg: #1e293b;
   --border-color: #334155;
   --header-bg: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
