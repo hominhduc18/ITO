@@ -60,26 +60,49 @@ function ThemeToggle() {
 function Sidebar({ active, onNavigate, collapsed, onToggle }: any) {
   const { t } = useTranslation();
 
-
   const items = [
-    {key: 'dashboard', label: t('dashboard')},
-    {key: 'registration', label: t('registration')},
-    {key: 'patientManagement', label: t('listRegistration')},
-    {key: 'payment', label: t('payment')},
-    {key: 'DoctorExamination', label: t('doctorExamination')},
-    {key: 'DoctorSchedule', label: t('doctorSchedule')},
-    {key: 'services', label: t('services')},
-    {key: 'reports', label: t('reports')},
-    {key: 'settings', label: t('settings')},
+    { key: 'dashboard', label: t('dashboard'), icon: '📊' },
+    { key: 'registration', label: t('registration'), icon: '📝' },
+    { key: 'patientManagement', label: t('listRegistration'), icon: '👥' },
+    { key: 'payment', label: t('payment'), icon: '💰' },
+    { key: 'DoctorExamination', label: t('doctorExamination'), icon: '👨‍⚕️' },
+    { key: 'DoctorSchedule', label: t('doctorSchedule'), icon: '📅' },
+    { key: 'services', label: t('services'), icon: '🛠️' },
+    { key: 'reports', label: t('reports'), icon: '📈' },
+    { key: 'settings', label: t('settings'), icon: '⚙️' },
   ]
 
   return (
       <aside className={`sidebar-fixed ${collapsed ? 'is-collapsed' : ''}`}>
         <div className="sidebar__header">
-          {!collapsed && (
-              <div className="brand">
-                <div className="brand__name">{t('hospitalName')}</div>
-                <div className="brand__sub">{t('hospitalSubtitle')}</div>
+          {!collapsed ? (
+              <div className="brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div className="brand-logo" style={{ display: 'flex', alignItems: 'center' }}>
+                  <div className="logo-icon">
+                    <img
+                        src="/image/otp.png"
+                        alt="SAIGON-ITO"
+                        className="logo-image"
+                        style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                    />
+                  </div>
+                  <div className="logo-pulse"></div>
+                </div>
+                <div className="brand-content">
+                  <div className="brand__name">SAIGON-ITO</div>
+                </div>
+              </div>
+          ) : (
+              <div className="brand-collapsed">
+                <div className="logo-icon">
+                  <img
+                      src="/image/otp.png"
+                      alt="SAIGON-ITO"
+                      className="logo-image"
+                      style={{ width: '32px', height: '32px', objectFit: 'contain' }}
+                  />
+                </div>
+                <div className="logo-pulse"></div>
               </div>
           )}
           <button className="toggle" onClick={onToggle} title={collapsed ? t('expand') : t('collapse')}>
@@ -95,12 +118,13 @@ function Sidebar({ active, onNavigate, collapsed, onToggle }: any) {
                   type="button"
                   title={it.label}
               >
-                {!collapsed ? it.label : it.label.charAt(0)}
+                <span className="nav-icon">{it.icon}</span>
+                {!collapsed && <span className="nav-text">{it.label}</span>}
               </button>
           ))}
         </nav>
         <div className="sidebar__footer">
-          {!collapsed ? `@2025 ${t('copyright')}` : '©'}
+          {!collapsed ? ` ${t('copyright')}` : '©'}
           {!collapsed && <div className="version">{t('version')}</div>}
         </div>
       </aside>
@@ -222,9 +246,6 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
       case 'dashboard':
         return <Dashboard/>
 
-
-
-
       case 'registration':
         return (
             <>
@@ -311,9 +332,7 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
         )
       case 'patientManagement':
         return (
-            <PatientManagementSimple
-
-            />
+            <PatientManagementSimple />
         )
       case 'services':
         return <ServiceCatalogForm/>
@@ -347,9 +366,6 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
           <header className="sticky blue-header">
             <div className="header-content">
               <div className="header-left">
-                <div className="logo-container">
-                  {/* Logo có thể thêm sau */}
-                </div>
                 <div className="hospital-info">
                   <div className="hospital-name">{t('hospitalName')}</div>
                   <div className="hospital-subtitle">{t('hospitalSubtitle')}</div>
@@ -374,8 +390,6 @@ export function RegistrationPage({makeUseCase}: { makeUseCase: () => RegisterVis
       </div>
   )
 }
-
-
 
 // Inject styles (giữ nguyên CSS hiện tại)
 const style = document.createElement('style')
@@ -451,17 +465,16 @@ style.innerHTML = `
   color: var(--text-color);
 }
 
-/* Giữ nguyên phần CSS còn lại... */
-/* ... (toàn bộ CSS hiện tại giữ nguyên) ... */
 
-.blue-header {
-  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%) !important;
-  color: white !important;
-}
 
 [data-theme="light"] .blue-header {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+  background: linear-gradient(135deg, #84b7e3 0%, #0969e1 100%) !important
   color: #1e3a8a !important;
+}
+
+.blue-header {
+  background: linear-gradient(135deg, #045cfd 0%, #1f9fe9 100%) !important;
+  color: white !important;
 }
 
 /* Scrollbar styling */

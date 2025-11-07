@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import './AccountSetting.css';
 
 // Types
 interface UserProfile {
@@ -22,7 +23,11 @@ interface SystemSettings {
     autoLogout: number;
 }
 
-export function AccountSettings() {
+interface AccountSettingsProps {
+    onLogout?: () => void;
+}
+
+export function AccountSettings({ onLogout }: AccountSettingsProps) {
     const [activeTab, setActiveTab] = useState<'profile' | 'system'>('profile');
     const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -57,6 +62,16 @@ export function AccountSettings() {
         setIsDarkMode(isDark);
     }, []);
 
+    const handleLogout = () => {
+        localStorage.removeItem('access_token');
+        if (onLogout) {
+            onLogout();
+        } else {
+            // Fallback: reload page or redirect
+            window.location.href = '/login';
+        }
+    };
+
     const handleSaveProfile = () => {
         setUserProfile(tempProfile);
         setIsEditing(false);
@@ -83,24 +98,9 @@ export function AccountSettings() {
         );
     };
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('vi-VN', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
-    };
-
     return (
         <div className="account-settings-container">
-            <div className="settings-header">
-                <div className="header-content">
-                    <div className="header-title">
-                        <h1>⚙️ Cấu Hình Tài Khoản</h1>
-                        <p>Quản lý thông tin cá nhân và cài đặt hệ thống</p>
-                    </div>
-                </div>
-            </div>
+
 
             <div className="settings-layout">
                 {/* Navigation Sidebar */}
@@ -161,23 +161,31 @@ export function AccountSettings() {
                                     <h2>👤 Thông Tin Cá Nhân</h2>
                                     <p>Quản lý thông tin cá nhân và hồ sơ của bạn</p>
                                 </div>
-                                {!isEditing ? (
+                                <div className="header-actions">
+                                    {!isEditing ? (
+                                        <button
+                                            className="btn btn-primary"
+                                            onClick={() => setIsEditing(true)}
+                                        >
+                                            <span>✏️ Chỉnh sửa</span>
+                                        </button>
+                                    ) : (
+                                        <div className="action-buttons">
+                                            <button className="btn btn-success" onClick={handleSaveProfile}>
+                                                <span>💾 Lưu thay đổi</span>
+                                            </button>
+                                            <button className="btn btn-secondary" onClick={handleCancelEdit}>
+                                                <span>❌ Hủy bỏ</span>
+                                            </button>
+                                        </div>
+                                    )}
                                     <button
-                                        className="btn btn-primary"
-                                        onClick={() => setIsEditing(true)}
+                                        className="btn btn-logout"
+                                        onClick={handleLogout}
                                     >
-                                        <span>✏️ Chỉnh sửa</span>
+                                        <span>🚪 Đăng xuất</span>
                                     </button>
-                                ) : (
-                                    <div className="action-buttons">
-                                        <button className="btn btn-success" onClick={handleSaveProfile}>
-                                            <span>💾 Lưu thay đổi</span>
-                                        </button>
-                                        <button className="btn btn-secondary" onClick={handleCancelEdit}>
-                                            <span>❌ Hủy bỏ</span>
-                                        </button>
-                                    </div>
-                                )}
+                                </div>
                             </div>
 
                             <div className="card-body">
@@ -269,6 +277,12 @@ export function AccountSettings() {
                                     <h2>⚙️ Cài Đặt Hệ Thống</h2>
                                     <p>Tùy chỉnh giao diện và hành vi hệ thống</p>
                                 </div>
+                                <button
+                                    className="btn btn-logout"
+                                    onClick={handleLogout}
+                                >
+                                    <span>🚪 Đăng xuất</span>
+                                </button>
                             </div>
 
                             <div className="card-body">
@@ -327,455 +341,6 @@ export function AccountSettings() {
                     )}
                 </div>
             </div>
-
-            <style>{`
-                .account-settings-container {
-                    min-height: 100vh;
-                    background: var(--bg-color);
-                    font-family: 'Segoe UI', system-ui, sans-serif;
-                    color: var(--text-color);
-                }
-
-                .settings-header {
-                    background: var(--header-bg);
-                    color: var(--header-text);
-                    padding: 1.5rem 0;
-                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-                }
-
-                .header-content {
-                    max-width: 1200px;
-                    margin: 0 auto;
-                    padding: 0 2rem;
-                }
-
-                .header-title h1 {
-                    margin: 0 0 0.25rem 0;
-                    font-size: 1.5rem;
-                    font-weight: 700;
-                }
-
-                .header-title p {
-                    margin: 0;
-                    opacity: 0.9;
-                    font-size: 0.9rem;
-                }
-
-                .settings-layout {
-                    max-width: 1200px;
-                    margin: 0 auto;
-                    padding: 2rem;
-                    display: grid;
-                    grid-template-columns: 280px 1fr;
-                    gap: 2rem;
-                }
-
-                .settings-nav {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1.5rem;
-                }
-
-                .user-profile-card {
-                    background: var(--card-bg);
-                    border-radius: 12px;
-                    padding: 1.5rem;
-                    box-shadow: var(--shadow);
-                    border: 1px solid var(--border-color);
-                }
-
-                .avatar-section {
-                    text-align: center;
-                    margin-bottom: 1rem;
-                }
-
-                .avatar-placeholder {
-                    width: 60px;
-                    height: 60px;
-                    border-radius: 50%;
-                    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: white;
-                    font-size: 1.2rem;
-                    font-weight: bold;
-                    margin: 0 auto 0.75rem;
-                }
-
-                .user-status {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 0.5rem;
-                    font-size: 0.8rem;
-                    color: #059669;
-                }
-
-                .status-indicator {
-                    width: 6px;
-                    height: 6px;
-                    border-radius: 50%;
-                    background: #059669;
-                    animation: pulse 2s infinite;
-                }
-
-                @keyframes pulse {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0.5; }
-                }
-
-                .user-details h3 {
-                    margin: 0 0 0.25rem 0;
-                    font-size: 1.1rem;
-                    font-weight: 600;
-                    text-align: center;
-                    color: var(--text-color);
-                }
-
-                .user-details p {
-                    margin: 0 0 0.75rem 0;
-                    color: var(--muted-color);
-                    text-align: center;
-                    font-size: 0.9rem;
-                }
-
-                .user-meta {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.25rem;
-                    font-size: 0.8rem;
-                    color: var(--muted-color);
-                }
-
-                .nav-menu {
-                    background: var(--card-bg);
-                    border-radius: 12px;
-                    padding: 1rem;
-                    box-shadow: var(--shadow);
-                    border: 1px solid var(--border-color);
-                }
-
-                .nav-item {
-                    width: 100%;
-                    display: flex;
-                    align-items: center;
-                    gap: 0.75rem;
-                    padding: 0.75rem;
-                    border: none;
-                    background: transparent;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    margin-bottom: 0.5rem;
-                    color: var(--text-color);
-                    font-size: 0.9rem;
-                }
-
-                .nav-item:last-child {
-                    margin-bottom: 0;
-                }
-
-                .nav-item:hover {
-                    background: var(--sidebar-hover);
-                }
-
-                .nav-item.active {
-                    background: var(--btn-primary-bg);
-                    color: var(--btn-primary-text);
-                }
-
-                .nav-icon {
-                    font-size: 1.1rem;
-                }
-
-                .nav-text {
-                    flex: 1;
-                    text-align: left;
-                    font-weight: 500;
-                }
-
-                .settings-content {
-                    min-height: 500px;
-                }
-
-                .content-card {
-                    background: var(--card-bg);
-                    border-radius: 12px;
-                    box-shadow: var(--shadow);
-                    border: 1px solid var(--border-color);
-                    overflow: hidden;
-                }
-
-                .card-header {
-                    padding: 1.5rem;
-                    border-bottom: 1px solid var(--border-color);
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                }
-
-                .header-title h2 {
-                    margin: 0 0 0.25rem 0;
-                    font-size: 1.3rem;
-                    font-weight: 600;
-                    color: var(--text-color);
-                }
-
-                .header-title p {
-                    margin: 0;
-                    color: var(--muted-color);
-                    font-size: 0.9rem;
-                }
-
-                .card-body {
-                    padding: 1.5rem;
-                }
-
-                .btn {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    padding: 0.5rem 1rem;
-                    border: none;
-                    border-radius: 6px;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    font-size: 0.85rem;
-                }
-
-                .btn-primary {
-                    background: var(--btn-primary-bg);
-                    color: var(--btn-primary-text);
-                }
-
-                .btn-primary:hover {
-                    opacity: 0.9;
-                    transform: translateY(-1px);
-                }
-
-                .btn-success {
-                    background: #059669;
-                    color: white;
-                }
-
-                .btn-success:hover {
-                    background: #047857;
-                }
-
-                .btn-secondary {
-                    background: var(--btn-bg);
-                    color: var(--text-color);
-                    border: 1px solid var(--btn-border);
-                }
-
-                .btn-secondary:hover {
-                    background: var(--sidebar-hover);
-                }
-
-                .action-buttons {
-                    display: flex;
-                    gap: 0.5rem;
-                }
-
-                .form-section {
-                    margin-bottom: 1.5rem;
-                }
-
-                .form-section:last-child {
-                    margin-bottom: 0;
-                }
-
-                .form-section h3 {
-                    margin: 0 0 0.75rem 0;
-                    font-size: 1rem;
-                    font-weight: 600;
-                    padding-bottom: 0.5rem;
-                    border-bottom: 1px solid var(--border-color);
-                    color: var(--text-color);
-                }
-
-                .form-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 1rem;
-                }
-
-                .form-group {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.5rem;
-                }
-
-                .form-group label {
-                    font-weight: 600;
-                    font-size: 0.85rem;
-                    color: var(--text-color);
-                }
-
-                .form-input {
-                    padding: 0.5rem 0.75rem;
-                    border: 1px solid var(--border-color);
-                    border-radius: 6px;
-                    font-size: 0.85rem;
-                    transition: all 0.3s ease;
-                    background: var(--bg-color);
-                    color: var(--text-color);
-                }
-
-                .form-input:focus {
-                    outline: none;
-                    border-color: var(--btn-primary-bg);
-                    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-                }
-
-                .form-value {
-                    padding: 0.5rem 0.75rem;
-                    background: var(--bg-color);
-                    border: 1px solid var(--border-color);
-                    border-radius: 6px;
-                    font-size: 0.85rem;
-                    color: var(--text-color);
-                }
-
-                .form-select {
-                    padding: 0.5rem 0.75rem;
-                    border: 1px solid var(--border-color);
-                    border-radius: 6px;
-                    font-size: 0.85rem;
-                    background: var(--bg-color);
-                    color: var(--text-color);
-                    cursor: pointer;
-                }
-
-                .form-select:focus {
-                    outline: none;
-                    border-color: var(--btn-primary-bg);
-                    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-                }
-
-                .role-badge {
-                    padding: 0.25rem 0.5rem;
-                    color: white;
-                    border-radius: 12px;
-                    font-size: 0.75rem;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                    display: inline-block;
-                }
-
-                .status-badge.active {
-                    color: #059669;
-                    font-weight: 600;
-                }
-
-                .status-badge.inactive {
-                    color: #dc2626;
-                    font-weight: 600;
-                }
-
-                .settings-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                    gap: 1rem;
-                }
-
-                .setting-group {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.5rem;
-                }
-
-                .setting-group label {
-                    font-weight: 600;
-                    font-size: 0.85rem;
-                    color: var(--text-color);
-                }
-
-                /* Responsive Design */
-                @media (max-width: 1024px) {
-                    .settings-layout {
-                        grid-template-columns: 1fr;
-                        gap: 1.5rem;
-                        padding: 1.5rem;
-                    }
-                }
-
-                @media (max-width: 768px) {
-                    .settings-layout {
-                        padding: 1rem;
-                    }
-
-                    .header-content {
-                        padding: 0 1rem;
-                    }
-
-                    .header-title h1 {
-                        font-size: 1.25rem;
-                    }
-
-                    .card-header {
-                        flex-direction: column;
-                        gap: 1rem;
-                        align-items: flex-start;
-                    }
-
-                    .action-buttons {
-                        width: 100%;
-                        justify-content: space-between;
-                    }
-
-                    .form-grid {
-                        grid-template-columns: 1fr;
-                        gap: 1rem;
-                    }
-
-                    .settings-grid {
-                        grid-template-columns: 1fr;
-                    }
-
-                    .btn {
-                        width: 100%;
-                        justify-content: center;
-                    }
-                }
-
-                @media (max-width: 480px) {
-                    .settings-header {
-                        padding: 1rem 0;
-                    }
-
-                    .header-title h1 {
-                        font-size: 1.1rem;
-                    }
-
-                    .user-profile-card,
-                    .nav-menu,
-                    .content-card {
-                        padding: 1rem;
-                    }
-
-                    .card-body {
-                        padding: 1rem;
-                    }
-
-                    .avatar-placeholder {
-                        width: 50px;
-                        height: 50px;
-                        font-size: 1rem;
-                    }
-
-                    .user-details h3 {
-                        font-size: 1rem;
-                    }
-
-                    .nav-item {
-                        padding: 0.5rem;
-                    }
-                }
-            `}</style>
         </div>
     );
 }

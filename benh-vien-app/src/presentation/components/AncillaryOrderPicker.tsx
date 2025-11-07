@@ -248,7 +248,7 @@ export function AncillaryOrderPicker({ chosen, onAdd, onRemove, onUpdate, errors
                     borderRadius: 2,
                     display: 'inline-block'
                 }}></span>
-                🩺 Chỉ định cận lâm sàng
+                🩺 Chỉ định dịch vụ khám
             </h2>
 
             <div style={{

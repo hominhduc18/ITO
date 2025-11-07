@@ -995,7 +995,7 @@ export function ServiceCatalogForm() {// States
                         </div>
 
                         <div className="api-info">
-                            <span className="api-status">📡 API CRUD</span>
+
                             <span className="item-count">{services.length.toLocaleString()} dịch vụ</span>
                         </div>
                     </div>
