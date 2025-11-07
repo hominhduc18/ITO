@@ -36,6 +36,7 @@ const resources = {
             // Sidebar
             "dashboard": "Dashboard",
             "registration": "Registration & Services",
+            "listRegistration": "Reception List",
             "payment": "Payment",
             "doctorExamination": "Doctor Examination",
             "doctorSchedule": "Doctor Schedule",
@@ -210,6 +211,7 @@ const resources = {
             // Sidebar
             "dashboard": "Tổng quan",
             "registration": "Tiếp nhận & CLS",
+            "listRegistration": "Danh Sách Tiếp Nhận",
             "payment": "Thanh Toán",
             "doctorExamination": "Bác Sĩ Khám",
             "doctorSchedule": "Lịch Bác Sĩ",

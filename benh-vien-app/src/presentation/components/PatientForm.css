@@ -194,7 +194,7 @@
 .patient-name {
     font-weight: 600;
     margin-bottom: 4px;
-    color: var(--text-color);
+    color: #0f76dd;
 }
 
 .patient-details {
