@@ -30,7 +30,7 @@ pre.json { background:#0b1021; color:#d1d5db; border-radius: 12px; padding: 12px
   --text-color: #05c7f6;
   --card-bg: #ffffff;
   --border-color: #05c7f6;
-  --header-bg: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  --header-bg: linear-gradient(135deg, #2563eb 0%, #086fef 100%);
   --header-text: #ffffff;
   --sidebar-bg: #0f172a;
   --sidebar-text: #e5e7eb;
@@ -38,6 +38,7 @@ pre.json { background:#0b1021; color:#d1d5db; border-radius: 12px; padding: 12px
   --sidebar-hover: #111827;
   --sidebar-active: #1f2937;
   --muted-color: #6b7280;
+  --error-color: #dc2626;
   --error-color: #dc2626;
   --success-color: #065f46;
   --json-bg: #0b1021;
@@ -53,7 +54,7 @@ pre.json { background:#0b1021; color:#d1d5db; border-radius: 12px; padding: 12px
   --text-color: #0579ed;
   --card-bg: #1e293b;
   --border-color: #334155;
-  --header-bg: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  --header-bg: linear-gradient(135deg, #1e40af 0%, #097cf1 100%);
   --header-text: #ffffff;
   --sidebar-bg: #020617;
   --sidebar-text: #e2e8f0;
@@ -143,6 +144,7 @@ body {
 }
 
 .brand__sub {
+  font-style: normal;
   font-size: 11px;
   color: #d1d5db;
 }
@@ -232,7 +234,7 @@ body {
 }
 
 .header-content {
-  padding: 12px 24px;
+  padding: 6px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;

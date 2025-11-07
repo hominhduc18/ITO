@@ -1,0 +1,89 @@
+﻿/* components/SmartTextArea.css */
+.smart-textarea-container {
+    position: relative;
+    width: 100%;
+}
+
+.smart-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: vertical;
+    transition: all 0.2s ease;
+    background: white;
+    color: #1e293b;
+}
+
+.smart-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.smart-textarea::placeholder {
+    color: #94a3b8;
+}
+
+.suggestion-hint {
+    position: absolute;
+    top: -30px;
+    left: 0;
+    right: 0;
+    background: #1e293b;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideDown 0.2s ease;
+}
+
+.suggestion-hint kbd {
+    background: #3b82f6;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.shortcut-hints {
+    margin-top: 8px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.shortcut-hints small {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Dark theme support */
+[data-theme="dark"] .smart-textarea {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .smart-textarea:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
