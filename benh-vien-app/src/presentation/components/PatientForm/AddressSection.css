@@ -1,0 +1,271 @@
+﻿/* AddressSection.css */
+.address-section {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.address-section h3 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    color: var(--text-color, #111827);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.address-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.search-select-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.search-select-container label {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-color, #374151);
+}
+
+.search-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-field {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color, #d1d5db);
+    border-radius: 6px;
+    font-size: 14px;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-color, #111827);
+    transition: all 0.2s ease-in-out;
+}
+
+.search-field:focus {
+    outline: none;
+    border-color: var(--primary-color, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-field:hover:not(:disabled) {
+    border-color: var(--border-hover-color, #9ca3af);
+}
+
+.search-field:disabled {
+    background: var(--disabled-bg, #f3f4f6);
+    color: var(--disabled-color, #9ca3af);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.loading-text {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--muted-color, #6b7280);
+    font-style: italic;
+}
+
+.search-select-container select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color, #d1d5db);
+    border-radius: 6px;
+    font-size: 14px;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-color, #111827);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+.search-select-container select:focus {
+    outline: none;
+    border-color: var(--primary-color, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-select-container select:hover:not(:disabled) {
+    border-color: var(--border-hover-color, #9ca3af);
+}
+
+.search-select-container select:disabled {
+    background: var(--disabled-bg, #f3f4f6);
+    color: var(--disabled-color, #9ca3af);
+    cursor: not-allowed;
+    opacity: 0.7;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+/* TextInput và TextArea styling để đồng bộ */
+.address-section :global(.text-input),
+.address-section :global(.text-area) {
+    margin-bottom: 0;
+}
+
+.address-section :global(.text-input input),
+.address-section :global(.text-area textarea) {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color, #d1d5db);
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
+    background: var(--card-bg, #ffffff);
+    color: var(--text-color, #111827);
+}
+
+.address-section :global(.text-input input:focus),
+.address-section :global(.text-area textarea:focus) {
+    outline: none;
+    border-color: var(--primary-color, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.address-section :global(.text-input input:disabled),
+.address-section :global(.text-area textarea:disabled) {
+    background: var(--disabled-bg, #f3f4f6);
+    color: var(--disabled-color, #9ca3af);
+    cursor: not-allowed;
+}
+
+.address-section :global(.text-area textarea[readonly]) {
+    background: var(--readonly-bg, #f9fafb);
+    color: var(--muted-color, #6b7280);
+    cursor: default;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .address-section {
+        padding: 16px;
+    }
+
+    .address-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .address-section h3 {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .address-section {
+        padding: 12px;
+        border-radius: 6px;
+    }
+
+    .search-field,
+    .search-select-container select,
+    .address-section :global(.text-input input),
+    .address-section :global(.text-area textarea) {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+}
+
+/* Dark Theme Support */
+[data-theme="dark"] .address-section {
+    background: var(--dark-card-bg, #1f2937);
+    border-color: var(--dark-border-color, #374151);
+}
+
+[data-theme="dark"] .address-section h3 {
+    color: var(--dark-text-color, #f9fafb);
+}
+
+[data-theme="dark"] .search-select-container label {
+    color: var(--dark-text-color, #e5e7eb);
+}
+
+[data-theme="dark"] .search-field,
+[data-theme="dark"] .search-select-container select,
+[data-theme="dark"] .address-section :global(.text-input input),
+[data-theme="dark"] .address-section :global(.text-area textarea) {
+    background: var(--dark-input-bg, #374151);
+    border-color: var(--dark-border-color, #4b5563);
+    color: var(--dark-text-color, #f9fafb);
+}
+
+[data-theme="dark"] .search-field:focus,
+[data-theme="dark"] .search-select-container select:focus,
+[data-theme="dark"] .address-section :global(.text-input input:focus),
+[data-theme="dark"] .address-section :global(.text-area textarea:focus) {
+    border-color: var(--dark-primary-color, #60a5fa);
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+[data-theme="dark"] .search-field:hover:not(:disabled),
+[data-theme="dark"] .search-select-container select:hover:not(:disabled) {
+    border-color: var(--dark-border-hover-color, #6b7280);
+}
+
+[data-theme="dark"] .search-field:disabled,
+[data-theme="dark"] .search-select-container select:disabled,
+[data-theme="dark"] .address-section :global(.text-input input:disabled),
+[data-theme="dark"] .address-section :global(.text-area textarea:disabled) {
+    background: var(--dark-disabled-bg, #4b5563);
+    color: var(--dark-disabled-color, #9ca3af);
+}
+
+[data-theme="dark"] .address-section :global(.text-area textarea[readonly]) {
+    background: var(--dark-readonly-bg, #374151);
+    color: var(--dark-muted-color, #d1d5db);
+}
+
+[data-theme="dark"] .loading-text {
+    color: var(--dark-muted-color, #d1d5db);
+}
+
+/* Animation for loading states */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.search-select-container select:disabled,
+.search-field:disabled {
+    animation: pulse 2s infinite;
+}
+
+/* Focus states for accessibility */
+.search-field:focus-visible,
+.search-select-container select:focus-visible,
+.address-section :global(.text-input input:focus-visible),
+.address-section :global(.text-area textarea:focus-visible) {
+    outline: 2px solid var(--primary-color, #3b82f6);
+    outline-offset: 2px;
+}
+
+[data-theme="dark"] .search-field:focus-visible,
+[data-theme="dark"] .search-select-container select:focus-visible,
+[data-theme="dark"] .address-section :global(.text-input input:focus-visible),
+[data-theme="dark"] .address-section :global(.text-area textarea:focus-visible) {
+    outline-color: var(--dark-primary-color, #60a5fa);
+}

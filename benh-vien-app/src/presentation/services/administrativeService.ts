@@ -59,7 +59,7 @@ export class AdministrativeService {
      */
     static async loadEthnicities(): Promise<any[]> {
         try {
-            const response = await fetch('/api/DanhMuc/dan-toc');
+            const response = await fetch('/api/DanToc');
             if (response.ok) {
                 const data = await response.json();
                 return data.data || [];
