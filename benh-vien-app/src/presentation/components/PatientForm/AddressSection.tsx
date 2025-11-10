@@ -1,6 +1,6 @@
 import React from 'react';
 import { TextInput, TextArea, Select } from '../Field';
-import { AddressSectionProps } from '../../types/administrative';
+import { AddressSectionProps } from '@presentation/models/administrative';
 
 /**
  * Component hiển thị phần thông tin địa chỉ

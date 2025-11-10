@@ -1,7 +1,7 @@
 import React from 'react';
-import { PatientFormProps } from '../../types/patient';
-import { DonViHanhChinh } from '../../types/administrative';
-import { TiepNhanResponse } from '../../types/tiepNhan';
+import { PatientFormProps } from '@presentation/models/patient';
+import { DonViHanhChinh } from '@presentation/models/administrative';
+import { TiepNhanResponse } from '@presentation/models/tiepNhan';
 import { PatientSearch } from './PatientSearch';
 import { PatientInfo } from './PatientInfo';
 import { AddressSection } from './AddressSection';
@@ -10,6 +10,7 @@ import { AdministrativeService } from '../../services/administrativeService';
 import { PatientService } from '../../services/patientService';
 import { TiepNhanService } from '../../services/tiepNhanService';
 import './PatientForm.css';
+import {Doctor} from "@presentation/models/doctor";
 
 /**
  * Component chính quản lý form thông tin bệnh nhân và đăng ký tiếp nhận
@@ -36,6 +37,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({
     const [countries, setCountries] = React.useState<DonViHanhChinh[]>([]);
     const [provinces, setProvinces] = React.useState<DonViHanhChinh[]>([]);
     const [districts, setDistricts] = React.useState<DonViHanhChinh[]>([]);
+
     const [wards, setWards] = React.useState<DonViHanhChinh[]>([]);
     const [ethnicities, setEthnicities] = React.useState<any[]>([]);
 
@@ -124,6 +126,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({
             // Load dân tộc
             const ethnicitiesData = await AdministrativeService.loadEthnicities();
             setEthnicities(ethnicitiesData);
+
         } catch (error) {
             console.error('Error loading master data:', error);
         }

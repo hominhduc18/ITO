@@ -10,7 +10,7 @@ import 'stimulsoft-reports-js/Scripts/stimulsoft.designer';
 import 'stimulsoft-reports-js/Css/stimulsoft.viewer.office2013.whiteblue.css';
 import 'stimulsoft-reports-js/Css/stimulsoft.designer.office2013.whiteblue.css';
 
-// Khai báo global types
+// Khai báo global models
 declare global {
     namespace Stimulsoft {
         namespace Report {

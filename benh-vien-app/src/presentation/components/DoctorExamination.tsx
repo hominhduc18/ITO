@@ -1,7 +1,7 @@
 ﻿// components/DoctorExamination.jsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-// Định nghĩa types
+// Định nghĩa models
 const SmartTextArea = ({
                            value = '',
                            onChange,

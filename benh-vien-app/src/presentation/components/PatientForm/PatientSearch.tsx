@@ -1,5 +1,5 @@
 import React from 'react';
-import { PatientSearchProps } from '../../types/patient';
+import { PatientSearchProps } from '@presentation/models/patient';
 
 /**
  * Component tìm kiếm bệnh nhân

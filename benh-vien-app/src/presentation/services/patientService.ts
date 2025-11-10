@@ -1,4 +1,4 @@
-import { Patient } from '../types/patient';
+import { Patient } from '@presentation/models/patient';
 
 
 export class PatientService {

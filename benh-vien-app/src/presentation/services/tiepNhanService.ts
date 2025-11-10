@@ -1,4 +1,4 @@
-import { TiepNhanResponse } from '../types/tiepNhan';
+import { TiepNhanResponse } from '@presentation/models/tiepNhan';
 
 /**
  * Service để gọi API tiếp nhận

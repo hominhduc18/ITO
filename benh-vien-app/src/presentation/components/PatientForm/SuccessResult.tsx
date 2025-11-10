@@ -1,5 +1,5 @@
 import React from 'react';
-import { TiepNhanResponse } from '../../types/tiepNhan';
+import { TiepNhanResponse } from '@presentation/models/tiepNhan';
 
 /**
  * Props cho component SuccessResult

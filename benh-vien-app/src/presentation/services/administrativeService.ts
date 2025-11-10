@@ -1,4 +1,4 @@
-import { DonViHanhChinh } from '../types/administrative';
+import { DonViHanhChinh } from '@presentation/models/administrative';
 
 
 export class AdministrativeService {
@@ -70,4 +70,9 @@ export class AdministrativeService {
             return [];
         }
     }
+
+    /**
+     * Lấy danh sách Bac si theo chi nhanh
+     */
+
 }
