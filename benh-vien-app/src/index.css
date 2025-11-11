@@ -46,7 +46,7 @@ pre.json { background:#0b1021; color:#d1d5db; border-radius: 12px; padding: 12px
   --btn-bg: #ffffff;
   --btn-border: #d1d5db;
   --btn-primary-bg: #2563eb;
-  --btn-primary-text: #ffffff;
+  --btn-primary-text: #0a59d3;
 }
 
 [data-theme="dark"] {
@@ -69,7 +69,7 @@ pre.json { background:#0b1021; color:#d1d5db; border-radius: 12px; padding: 12px
   --btn-bg: #334155;
   --btn-border: #475569;
   --btn-primary-bg: #3b82f6;
-  --btn-primary-text: #ffffff;
+  --btn-primary-text:#0a59d3;
 }
 
 * {

@@ -1,11 +1,291 @@
-﻿.patient-management-simple {
-    padding: 20px;
-    max-width: 1000px;
-    margin: 0 auto;
+﻿/* PatientManagementSimple.css */
+:root {
+    /* Light theme variables */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-card: #ffffff;
+    --text-primary: #2c3e50;
+    --text-secondary: #495057;
+    --text-muted: #6c757d;
+    --border-color: #e0e0e0;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    /* Colors */
+    --primary: #007bff;
+    --primary-hover: #0056b3;
+    --success: #28a745;
+    --success-hover: #218838;
+    --info: #17a2b8;
+    --info-hover: #138496;
+    --warning: #ffc107;
+    --warning-hover: #e0a800;
+    --danger: #dc3545;
+    --danger-hover: #c82333;
+
+    /* Status colors */
+    --status-pending: #fff3cd;
+    --status-pending-text: #856404;
+    --status-completed: #d4edda;
+    --status-completed-text: #155724;
+    --status-processing: #d1edff;
+    --status-processing-text: #0c5460;
 }
 
-/* Header */
+[data-theme="dark"] {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-card: #2c678b;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --text-muted: #999999;
+    --border-color: #444444;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+    /* Colors */
+    --primary: #4dabf7;
+    --primary-hover: #339af0;
+    --success: #51cf66;
+    --success-hover: #40c057;
+    --info: #3bc9db;
+    --info-hover: #22b8cf;
+    --warning: #ffd43b;
+    --warning-hover: #fcc419;
+    --danger: #ff6b6b;
+    --danger-hover: #fa5252;
+
+    /* Status colors */
+    --status-pending: #5c4f00;
+    --status-pending-text: #ffd43b;
+    --status-completed: #2b5a2b;
+    --status-completed-text: #8ce99a;
+    --status-processing: #1a3d5c;
+    --status-processing-text: #74c0fc;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+/* PatientManagementSimple.css */
+/* PatientManagementSimple.css */
+.patient-management-simple {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-color);
+}
+
 .pm-header {
+    padding: 16px 24px;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.pm-header h1 {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 1.5rem;
+}
+
+.pm-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Danh sách bên trái */
+.list-section {
+    width: 400px;
+    border-right: 1px solid var(--border-color);
+    background: var(--card-bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.search-bar {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.search-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--input-bg);
+    color: var(--text-color);
+}
+
+.refresh-btn {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--btn-bg);
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.registrations-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.registration-card {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.registration-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.registration-card.selected {
+    border-color: var(--primary-color);
+    background: rgba(37, 99, 235, 0.05);
+}
+
+/* Thông tin compact */
+.compact-info {
+    margin-bottom: 8px;
+}
+
+.patient-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 4px;
+}
+
+.patient-name {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 14px;
+}
+
+.patient-age-gender {
+    font-size: 12px;
+    color: var(--muted-color);
+}
+
+.patient-contact {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.patient-phone {
+    color: var(--text-color);
+}
+
+.patient-id {
+    color: var(--muted-color);
+    background: var(--border-color);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Thông tin khám compact */
+.appointment-compact {
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.appointment-time,
+.appointment-department,
+.appointment-doctor {
+    margin-bottom: 2px;
+    color: var(--text-color);
+}
+
+/* Dịch vụ compact */
+.services-compact {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.services-count {
+    color: var(--muted-color);
+}
+
+.total-amount {
+    color: var(--error-color);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Footer card */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.status.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status.completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.action-btn {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.print-btn:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Chi tiết bên phải */
+.detail-section {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--bg-color);
+    padding: 24px;
+}
+
+.detail-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -14,262 +294,134 @@
     border-bottom: 2px solid var(--border-color);
 }
 
-.pm-header h1 {
+.detail-header h2 {
     margin: 0;
     color: var(--text-color);
-    font-size: 24px;
 }
 
-.pm-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.tab-btn {
-    padding: 10px 16px;
-    border: 1px solid var(--border-color);
-    background: var(--btn-bg);
-    color: var(--text-color);
-    border-radius: 8px;
+.detail-header .print-btn {
+    padding: 8px 16px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    font-weight: 500;
 }
 
-.tab-btn.active {
-    background: var(--btn-primary-bg);
-    color: var(--btn-primary-text);
-    border-color: var(--btn-primary-bg);
-}
-
-.tab-btn:hover {
-    transform: translateY(-1px);
-}
-
-/* Tìm kiếm */
-.search-bar {
-    display: flex;
-    gap: 12px;
+.info-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
     margin-bottom: 20px;
 }
 
-.search-input {
-    flex: 1;
-    padding: 12px 16px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background: var(--card-bg);
+.info-card h3 {
+    margin: 0 0 16px 0;
     color: var(--text-color);
-    font-size: 14px;
+    font-size: 16px;
 }
 
-.search-input:focus {
-    outline: none;
-    border-color: var(--btn-primary-bg);
-}
-
-.refresh-btn {
-    padding: 12px 16px;
-    border: 1px solid var(--border-color);
-    background: var(--btn-bg);
-    color: var(--text-color);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.refresh-btn:hover {
-    background: var(--bg-color);
-}
-
-/* Danh sách bệnh nhân */
-.patients-list {
-    display: flex;
-    flex-direction: column;
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 12px;
 }
 
-.patient-card {
+.info-item {
     display: flex;
-    justify-content: between;
-    align-items: flex-start;
-    padding: 16px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background: var(--card-bg);
-    transition: all 0.2s ease;
-}
-
-.patient-card:hover {
-    border-color: var(--btn-primary-bg);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.patient-info {
-    flex: 1;
-}
-
-.patient-name {
-    font-weight: 600;
-    font-size: 16px;
-    color: var(--text-color);
-    margin-bottom: 8px;
-}
-
-.patient-details {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    font-size: 14px;
-    color: var(--muted-color);
-    margin-bottom: 8px;
-}
-
-.patient-details span {
-    display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 4px;
 }
 
-.patient-address {
-    font-size: 13px;
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-item label {
+    font-size: 12px;
     color: var(--muted-color);
-    font-style: italic;
-}
-
-.delete-btn {
-    padding: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--btn-bg);
-    color: var(--text-color);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.delete-btn:hover {
-    background: #fee2e2;
-    color: #dc2626;
-    border-color: #fecaca;
-}
-
-/* Form thêm mới */
-.simple-form {
-    background: var(--card-bg);
-    padding: 24px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-}
-
-.form-group {
-    margin-bottom: 16px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 6px;
     font-weight: 500;
-    color: var(--text-color);
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background: var(--card-bg);
+.info-item span {
     color: var(--text-color);
+    font-weight: 500;
+}
+
+.services-table {
+    overflow-x: auto;
+}
+
+.services-table table {
+    width: 100%;
+    border-collapse: collapse;
     font-size: 14px;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--btn-primary-bg);
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
-
-.form-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border-color);
-}
-
-.submit-btn {
-    padding: 12px 24px;
-    background: var(--btn-primary-bg);
-    color: var(--btn-primary-text);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.submit-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.cancel-btn {
-    padding: 12px 24px;
+.services-table th,
+.services-table td {
+    padding: 8px 12px;
     border: 1px solid var(--border-color);
-    background: var(--btn-bg);
+    text-align: left;
+}
+
+.services-table th {
+    background: var(--border-color);
+    font-weight: 600;
     color: var(--text-color);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
 }
 
-.cancel-btn:hover {
-    background: var(--bg-color);
+.services-table tfoot {
+    font-weight: 600;
 }
 
-/* Trạng thái */
-.loading, .empty-state {
+.status-da-hoan-thanh {
+    background: #d1fae5;
+    color: #065f46;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.status-dang-cho {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.empty-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
     text-align: center;
-    padding: 40px;
     color: var(--muted-color);
-    font-size: 16px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .pm-header {
-        flex-direction: column;
-        gap: 16px;
-        align-items: stretch;
-    }
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
 
-    .pm-actions {
-        justify-content: stretch;
-    }
+.empty-detail h3 {
+    margin: 0 0 8px 0;
+    color: var(--text-color);
+}
 
-    .tab-btn {
-        flex: 1;
-        text-align: center;
-    }
+.empty-detail p {
+    margin: 0;
+    max-width: 400px;
+    line-height: 1.5;
+}
 
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .patient-details {
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .form-actions {
-        flex-direction: column;
-    }
+.loading,
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted-color);
 }
